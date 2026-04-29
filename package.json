@@ -1,0 +1,15 @@
+{
+  "name": "openlearn-root",
+  "version": "1.0.0",
+  "description": "OpenLearn project root",
+  "private": true,
+  "workspaces": [
+    "open-learn"
+  ],
+  "scripts": {
+    "dev": "cd open-learn && npm run dev",
+    "build": "cd open-learn && npm run build",
+    "start": "cd open-learn && npm start",
+    "lint": "cd open-learn && npm run lint"
+  }
+}
