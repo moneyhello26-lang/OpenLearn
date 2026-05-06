@@ -1,117 +1,131 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const KZ_KEYWORDS = ['физика', 'математика', 'алгебра', 'геометрия', 'информатика', 'казахстан', 'учебник', 'школа', 'класс', 'physics', 'math', 'geometry', 'algebra'];
+const PROG_KEYWORDS = ['программирование', 'python', 'javascript', 'java', 'programming', 'code', 'developer', 'web', 'algorithm', 'machine learning', 'kotlin', 'react', 'node', 'css', 'html', 'linux', 'git', 'database', 'sql', 'c++', 'c#', 'rust', 'go', 'swift', 'typescript'];
+
+function isKzQuery(q: string) { return KZ_KEYWORDS.some(kw => q.toLowerCase().includes(kw)); }
+function isProgQuery(q: string) { return PROG_KEYWORDS.some(kw => q.toLowerCase().includes(kw)); }
+
+async function fetchKazakhstan(query: string, baseUrl: string) {
+  try {
+    const res = await fetch(`${baseUrl}/api/books/kazakhstan?q=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    return (data.books || []).map((b: any) => ({
+      ...b,
+      type: 'book',
+      category: 'Казахстан. Школьная программа',
+      hasFullText: b.hasPdf ?? false,
+      readerUrl: b.hasPdf ? b.pdfUrl : null,
+      url: b.hasPdf ? b.pdfUrl : b.pageUrl,
+    }));
+  } catch { return []; }
+}
+
+async function fetchGoogle(query: string) {
+  try {
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&filter=free-ebooks&maxResults=10&printType=books`);
+    const data = await res.json();
+    return (data.items || []).map((item: any) => {
+      const info = item.volumeInfo;
+      const access = item.accessInfo;
+      const hasFullText = access?.viewability === 'ALL_PAGES' || access?.epub?.isAvailable || access?.pdf?.isAvailable;
+      const readUrl = info.canonicalVolumeLink || info.previewLink;
+      return {
+        id: `google-${item.id}`,
+        title: info.title || '',
+        authors: info.authors || [],
+        description: info.description || info.subtitle || '',
+        image: (info.imageLinks?.thumbnail || '').replace('http:', 'https:'),
+        price: 'Бесплатно',
+        url: readUrl,
+        pageUrl: info.infoLink,
+        source: 'Google Books',
+        type: 'book',
+        category: 'Книги',
+        hasFullText,
+        readerUrl: hasFullText ? readUrl : null,
+      };
+    });
+  } catch { return []; }
+}
+
+async function fetchITBooks(query: string) {
+  try {
+    const res = await fetch(`https://api.itbook.store/1.0/search/${encodeURIComponent(query)}`);
+    const data = await res.json();
+    return (data.books || []).map((book: any) => ({
+      id: `itbook-${book.isbn13}`,
+      title: book.title,
+      authors: book.authors ? book.authors.split(', ') : [],
+      description: book.subtitle || '',
+      image: book.image,
+      price: book.price === '$0.00' ? 'Бесплатно' : book.price,
+      url: book.url,
+      pageUrl: book.url,
+      source: 'IT Book Store',
+      type: 'book',
+      category: 'IT и программирование',
+      hasFullText: false,
+      readerUrl: null,
+    }));
+  } catch { return []; }
+}
+
+async function fetchOpenLibrary(query: string, baseUrl: string) {
+  try {
+    const res = await fetch(`${baseUrl}/api/books/openlibrary?q=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    return (data.books || []).map((b: any) => ({
+      ...b,
+      readerUrl: b.hasFullText && b.iaId ? `https://archive.org/embed/${b.iaId}` : null,
+    }));
+  } catch { return []; }
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q') || '';
-  const type = searchParams.get('type') || 'all'; // 'all', 'book', 'course'
+  const type = searchParams.get('type') || 'all';
+  const baseUrl = request.nextUrl.origin;
+
+  if (!query) {
+    return NextResponse.json({ results: [], total: 0, query, type });
+  }
 
   try {
-    // Для демонстрации добавим несколько курсов (пока статично)
-    const courses = [
-      {
-        id: 'course-1',
-        title: 'Введение в React',
-        authors: ['Иван Петров'],
-        description: 'Полный курс по React для начинающих разработчиков. Вы научитесь создавать современные веб-приложения с использованием React, TypeScript и лучших практик разработки.',
-        image: '',
-        price: '$49',
-        url: '/course/react-intro',
-        source: 'OpenLearn',
-        type: 'course',
-        category: 'Программирование'
-      },
-      {
-        id: 'course-2',
-        title: 'Основы Python',
-        authors: ['Анна Сидорова'],
-        description: 'Изучите Python с нуля до продвинутого уровня. Курс включает основы программирования, работу с данными и создание приложений.',
-        image: '',
-        price: '$39',
-        url: '/course/python-basics',
-        source: 'OpenLearn',
-        type: 'course',
-        category: 'Программирование'
+    const allBooks: any[] = [];
+    const isProg = isProgQuery(query);
+    const isKz = isKzQuery(query);
+
+    if (type !== 'course') {
+      // 1. Казахстанские учебники (приоритет для физики/математики/информатики)
+      if (isKz) {
+        const kzBooks = await fetchKazakhstan(query, baseUrl);
+        allBooks.push(...kzBooks);
       }
-    ];
 
-    // Имитация книг из разных источников
-    const mockBooks = [
-      {
-        id: 'book-1',
-        title: 'Python для начинающих',
-        authors: ['Джон Доу'],
-        description: 'Полное руководство по изучению Python с примерами и упражнениями.',
-        image: '',
-        price: 'Бесплатно',
-        url: 'https://example.com/python-book',
-        source: 'ITBook.store',
-        type: 'book',
-        category: 'IT и программирование'
-      },
-      {
-        id: 'book-2',
-        title: 'Введение в алгоритмы',
-        authors: ['Томас Кормен'],
-        description: 'Классическое руководство по алгоритмам и структурам данных.',
-        image: '',
-        price: '$25',
-        url: 'https://example.com/algorithms',
-        source: 'Google Books',
-        type: 'book',
-        category: 'Наука и академические профессии'
-      },
-      {
-        id: 'book-3',
-        title: 'Физика для инженеров',
-        authors: ['Ричард Фейнман'],
-        description: 'Увлекательное введение в мир физики с практическими примерами.',
-        image: '',
-        price: 'Бесплатно',
-        url: 'https://example.com/physics',
-        source: 'SpringerOpen',
-        type: 'book',
-        category: 'Технические и STEM профессии'
-      },
-      {
-        id: 'book-4',
-        title: 'История России',
-        authors: ['Василий Ключевский'],
-        description: 'Классический труд по истории российской государственности.',
-        image: '',
-        price: 'Бесплатно',
-        url: 'https://example.com/history',
-        source: 'Project Gutenberg',
-        type: 'book',
-        category: 'Классика и гуманитарные науки'
+      // 2. IT книги для программирования
+      if (isProg) {
+        const [itbooks, openlib] = await Promise.all([fetchITBooks(query), fetchOpenLibrary(query, baseUrl)]);
+        allBooks.push(...itbooks, ...openlib);
+      } else {
+        // 3. Глобальный поиск
+        const [google, openlib] = await Promise.all([fetchGoogle(query), fetchOpenLibrary(query, baseUrl)]);
+        allBooks.push(...google, ...openlib);
       }
-    ];
-
-    let results: any[] = [];
-
-    if (type === 'all' || type === 'book') {
-      results.push(...mockBooks);
     }
 
-    if (type === 'all' || type === 'course') {
-      results.push(...courses);
-    }
-
-    // Фильтрация по запросу если есть
-    if (query) {
-      results = results.filter(item =>
-        item.title.toLowerCase().includes(query.toLowerCase()) ||
-        item.description.toLowerCase().includes(query.toLowerCase()) ||
-        item.category.toLowerCase().includes(query.toLowerCase())
-      );
-    }
-
-    return NextResponse.json({
-      results,
-      total: results.length,
-      query,
-      type
+    // Дедупликация
+    const seen = new Set<string>();
+    const deduped = allBooks.filter(b => {
+      const key = `${b.title?.toLowerCase()}-${(b.authors?.[0] || '').toLowerCase()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
     });
+
+    return NextResponse.json({ results: deduped, total: deduped.length, query, type });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to search' }, { status: 500 });
+    return NextResponse.json({ error: 'Search failed', results: [] }, { status: 500 });
   }
 }
