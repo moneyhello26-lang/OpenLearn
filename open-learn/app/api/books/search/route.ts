@@ -14,9 +14,9 @@ async function fetchKazakhstan(query: string, baseUrl: string) {
       ...b,
       type: 'book',
       category: 'Казахстан. Школьная программа',
-      hasFullText: b.hasPdf ?? false,
-      readerUrl: b.hasPdf ? b.pdfUrl : null,
-      url: b.hasPdf ? b.pdfUrl : b.pageUrl,
+      hasFullText: false,
+      readerUrl: null,
+      url: b.pageUrl || b.url,
     }));
   } catch { return []; }
 }

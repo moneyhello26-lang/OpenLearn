@@ -1,280 +1,185 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Казахстанские учебники 5-11 класс (физика, математика, информатика)
-// Источник: emektep.kz (официальный портал МОН РК) и bilimland.kz
-// PDF-файлы берутся с открытого доступа МОН РК
+// Источник: okulyk.com — живой сайт с актуальными учебниками МОН РК
+// Структура URL: https://okulyk.com/{grade}-klass/{subject}-{grade}/
+// hasPdf: false — у них нет прямых PDF-ссылок, только страница на сайте
+
+const subjectSlug: Record<string, string> = {
+  'Математика': 'matematika',
+  'Алгебра': 'algebra',
+  'Геометрия': 'geometriya',
+  'Физика': 'fizika',
+  'Информатика': 'informatika',
+};
+
+function okulykUrl(grade: number, subjectKey: string) {
+  const slug = subjectSlug[subjectKey] || subjectKey.toLowerCase();
+  return `https://okulyk.com/${grade}-klass/${slug}-${grade}/`;
+}
 
 const KZ_TEXTBOOKS = [
-  // ===== МАТЕМАТИКА =====
+  // ===== МАТЕМАТИКА 5-6 =====
   {
-    id: 'kz-math-5-ru',
-    title: 'Математика. 5 класс',
+    id: 'kz-math-5-ru', title: 'Математика. 5 класс',
     authors: ['Акпаева А.Б.', 'Ибраева А.Т.'],
-    description: 'Учебник математики для 5 класса общеобразовательных школ Казахстана. Содержит темы: натуральные числа, дроби, проценты, геометрические фигуры.',
-    image: 'https://emektep.kz/api/textbook/cover/math5ru',
+    description: 'Учебник математики для 5 класса общеобразовательных школ Казахстана. Натуральные числа, дроби, проценты, геометрические фигуры.',
     grade: 5, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1078',
-    pageUrl: 'https://emektep.kz/catalog/books/5klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-math-6-ru',
-    title: 'Математика. 6 класс',
+    id: 'kz-math-6-ru', title: 'Математика. 6 класс',
     authors: ['Акпаева А.Б.', 'Ибраева А.Т.'],
-    description: 'Учебник математики для 6 класса. Темы: рациональные числа, пропорции, уравнения, геометрия.',
-    image: '',
+    description: 'Рациональные числа, пропорции, уравнения, геометрия.',
     grade: 6, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1079',
-    pageUrl: 'https://emektep.kz/catalog/books/6klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
+  // ===== АЛГЕБРА =====
   {
-    id: 'kz-algebra-7-ru',
-    title: 'Алгебра. 7 класс',
+    id: 'kz-algebra-7-ru', title: 'Алгебра. 7 класс',
     authors: ['Абылкасымова А.Е.', 'Жумагулов Б.Т.'],
-    description: 'Учебник алгебры для 7 класса. Алгебраические выражения, линейные уравнения и неравенства, системы уравнений, функции.',
-    image: '',
-    grade: 7, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1080',
-    pageUrl: 'https://emektep.kz/catalog/books/7klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
+    description: 'Алгебраические выражения, линейные уравнения и неравенства, системы уравнений, функции.',
+    grade: 7, subject: 'Алгебра', language: 'Русский',
   },
   {
-    id: 'kz-geometry-7-ru',
-    title: 'Геометрия. 7 класс',
-    authors: ['Шыныбеков А.Н.'],
-    description: 'Учебник геометрии для 7 класса. Геометрические фигуры, треугольники, параллельные прямые, доказательства теорем.',
-    image: '',
-    grade: 7, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1081',
-    pageUrl: 'https://emektep.kz/catalog/books/7klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
-  },
-  {
-    id: 'kz-algebra-8-ru',
-    title: 'Алгебра. 8 класс',
+    id: 'kz-algebra-8-ru', title: 'Алгебра. 8 класс',
     authors: ['Абылкасымова А.Е.'],
-    description: 'Учебник алгебры для 8 класса. Квадратные уравнения, квадратные корни, степени, функции.',
-    image: '',
-    grade: 8, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1082',
-    pageUrl: 'https://emektep.kz/catalog/books/8klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
+    description: 'Квадратные уравнения, квадратные корни, степени, функции.',
+    grade: 8, subject: 'Алгебра', language: 'Русский',
   },
   {
-    id: 'kz-geometry-8-ru',
-    title: 'Геометрия. 8 класс',
-    authors: ['Шыныбеков А.Н.'],
-    description: 'Учебник геометрии для 8 класса. Четырёхугольники, площади, подобие треугольников, теорема Пифагора.',
-    image: '',
-    grade: 8, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1083',
-    pageUrl: 'https://emektep.kz/catalog/books/8klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
-  },
-  {
-    id: 'kz-algebra-9-ru',
-    title: 'Алгебра. 9 класс',
+    id: 'kz-algebra-9-ru', title: 'Алгебра. 9 класс',
     authors: ['Абылкасымова А.Е.'],
-    description: 'Учебник алгебры для 9 класса. Квадратичная функция, тригонометрия, арифметическая и геометрическая прогрессии.',
-    image: '',
-    grade: 9, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1084',
-    pageUrl: 'https://emektep.kz/catalog/books/9klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
+    description: 'Квадратичная функция, тригонометрия, арифметическая и геометрическая прогрессии.',
+    grade: 9, subject: 'Алгебра', language: 'Русский',
   },
   {
-    id: 'kz-math-10-ru',
-    title: 'Математика. 10 класс (общественно-гуманитарный профиль)',
-    authors: ['Абылкасымова А.Е.', 'Нурмуканов М.'],
-    description: 'Учебник математики для 10 класса общественно-гуманитарного направления. Тригонометрия, показательные и логарифмические функции.',
-    image: '',
-    grade: 10, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1085',
-    pageUrl: 'https://emektep.kz/catalog/books/10klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
-  },
-  {
-    id: 'kz-algebra-10-stem-ru',
-    title: 'Алгебра и начала анализа. 10 класс (естественно-математический профиль)',
+    id: 'kz-algebra-10-ru', title: 'Алгебра и начала анализа. 10 класс',
     authors: ['Жумагулов Б.Т.', 'Абылкасымова А.Е.'],
-    description: 'Учебник алгебры и начал математического анализа для 10 класса ЕМН. Производная, пределы, тригонометрические уравнения, логарифмы.',
-    image: '',
-    grade: 10, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1086',
-    pageUrl: 'https://emektep.kz/catalog/books/10klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
+    description: 'Производная, пределы, тригонометрические уравнения, логарифмы.',
+    grade: 10, subject: 'Алгебра', language: 'Русский',
   },
   {
-    id: 'kz-algebra-11-stem-ru',
-    title: 'Алгебра и начала анализа. 11 класс (ЕМН)',
+    id: 'kz-algebra-11-ru', title: 'Алгебра и начала анализа. 11 класс',
     authors: ['Жумагулов Б.Т.', 'Абылкасымова А.Е.'],
-    description: 'Учебник алгебры для 11 класса ЕМН. Интеграл, уравнения, неравенства, методы решения задач ЕНТ.',
-    image: '',
-    grade: 11, subject: 'Математика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1087',
-    pageUrl: 'https://emektep.kz/catalog/books/11klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
+    description: 'Интеграл, уравнения, неравенства. Подготовка к ЕНТ.',
+    grade: 11, subject: 'Алгебра', language: 'Русский',
   },
-
+  // ===== ГЕОМЕТРИЯ =====
+  {
+    id: 'kz-geometry-7-ru', title: 'Геометрия. 7 класс',
+    authors: ['Шыныбеков А.Н.'],
+    description: 'Геометрические фигуры, треугольники, параллельные прямые, доказательства теорем.',
+    grade: 7, subject: 'Геометрия', language: 'Русский',
+  },
+  {
+    id: 'kz-geometry-8-ru', title: 'Геометрия. 8 класс',
+    authors: ['Шыныбеков А.Н.'],
+    description: 'Четырёхугольники, площади, подобие треугольников, теорема Пифагора.',
+    grade: 8, subject: 'Геометрия', language: 'Русский',
+  },
+  {
+    id: 'kz-geometry-9-ru', title: 'Геометрия. 9 класс',
+    authors: ['Шыныбеков А.Н.'],
+    description: 'Векторы, координаты, окружность, многоугольники.',
+    grade: 9, subject: 'Геометрия', language: 'Русский',
+  },
+  {
+    id: 'kz-geometry-10-ru', title: 'Геометрия. 10 класс',
+    authors: ['Шыныбеков А.Н.'],
+    description: 'Стереометрия: прямые и плоскости, многогранники.',
+    grade: 10, subject: 'Геометрия', language: 'Русский',
+  },
+  {
+    id: 'kz-geometry-11-ru', title: 'Геометрия. 11 класс',
+    authors: ['Шыныбеков А.Н.'],
+    description: 'Тела вращения, объёмы, координаты в пространстве.',
+    grade: 11, subject: 'Геометрия', language: 'Русский',
+  },
   // ===== ФИЗИКА =====
   {
-    id: 'kz-physics-7-ru',
-    title: 'Физика. 7 класс',
-    authors: ['Туякбаев Б.К.', 'Шайморданов А.'],
-    description: 'Учебник физики для 7 класса. Введение в физику, механическое движение, силы, давление, тепловые явления.',
-    image: '',
+    id: 'kz-physics-7-ru', title: 'Физика. 7 класс',
+    authors: ['Туякбаев Б.К.'],
+    description: 'Введение в физику, механическое движение, силы, давление, тепловые явления.',
     grade: 7, subject: 'Физика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1090',
-    pageUrl: 'https://emektep.kz/catalog/books/7klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-physics-8-ru',
-    title: 'Физика. 8 класс',
+    id: 'kz-physics-8-ru', title: 'Физика. 8 класс',
     authors: ['Туякбаев Б.К.'],
-    description: 'Учебник физики для 8 класса. Тепловые явления, электрический ток, электромагнетизм, оптика.',
-    image: '',
+    description: 'Тепловые явления, электрический ток, электромагнетизм, оптика.',
     grade: 8, subject: 'Физика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1091',
-    pageUrl: 'https://emektep.kz/catalog/books/8klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-physics-9-ru',
-    title: 'Физика. 9 класс',
+    id: 'kz-physics-9-ru', title: 'Физика. 9 класс',
     authors: ['Туякбаев Б.К.'],
-    description: 'Учебник физики для 9 класса. Законы движения, импульс, работа и энергия, электромагнитная индукция, атомная физика.',
-    image: '',
+    description: 'Законы движения, импульс, работа и энергия, электромагнитная индукция, атомная физика.',
     grade: 9, subject: 'Физика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1092',
-    pageUrl: 'https://emektep.kz/catalog/books/9klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-physics-10-ru',
-    title: 'Физика. 10 класс',
+    id: 'kz-physics-10-ru', title: 'Физика. 10 класс',
     authors: ['Туякбаев Б.К.', 'Кронгарт Б.К.'],
-    description: 'Учебник физики для 10 класса ЕМН. Кинематика, динамика, законы сохранения, молекулярная физика, термодинамика.',
-    image: '',
+    description: 'Кинематика, динамика, законы сохранения, молекулярная физика, термодинамика.',
     grade: 10, subject: 'Физика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1093',
-    pageUrl: 'https://emektep.kz/catalog/books/10klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-physics-11-ru',
-    title: 'Физика. 11 класс',
+    id: 'kz-physics-11-ru', title: 'Физика. 11 класс',
     authors: ['Туякбаев Б.К.', 'Кронгарт Б.К.'],
-    description: 'Учебник физики для 11 класса. Электродинамика, колебания и волны, оптика, квантовая и ядерная физика.',
-    image: '',
+    description: 'Электродинамика, колебания и волны, оптика, квантовая и ядерная физика.',
     grade: 11, subject: 'Физика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1094',
-    pageUrl: 'https://emektep.kz/catalog/books/11klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
-
   // ===== ИНФОРМАТИКА =====
   {
-    id: 'kz-cs-5-ru',
-    title: 'Информатика. 5 класс',
+    id: 'kz-cs-5-ru', title: 'Информатика. 5 класс',
     authors: ['Балапанов Е.Х.', 'Бөрібаев Б.'],
-    description: 'Учебник информатики для 5 класса. Устройство компьютера, операционная система, текстовый редактор, работа с файлами.',
-    image: '',
+    description: 'Устройство компьютера, операционная система, текстовый редактор, работа с файлами.',
     grade: 5, subject: 'Информатика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1100',
-    pageUrl: 'https://emektep.kz/catalog/books/5klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-cs-6-ru',
-    title: 'Информатика. 6 класс',
+    id: 'kz-cs-6-ru', title: 'Информатика. 6 класс',
     authors: ['Балапанов Е.Х.', 'Бөрібаев Б.'],
-    description: 'Учебник информатики для 6 класса. Электронные таблицы, базы данных, интернет, создание веб-страниц.',
-    image: '',
+    description: 'Электронные таблицы, базы данных, интернет, создание веб-страниц.',
     grade: 6, subject: 'Информатика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1101',
-    pageUrl: 'https://emektep.kz/catalog/books/6klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-cs-7-ru',
-    title: 'Информатика. 7 класс',
+    id: 'kz-cs-7-ru', title: 'Информатика. 7 класс',
     authors: ['Балапанов Е.Х.', 'Бөрібаев Б.'],
-    description: 'Учебник информатики для 7 класса. Алгоритмы, блок-схемы, основы программирования на Scratch, работа с данными.',
-    image: '',
+    description: 'Алгоритмы, блок-схемы, основы программирования на Scratch.',
     grade: 7, subject: 'Информатика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1102',
-    pageUrl: 'https://emektep.kz/catalog/books/7klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-cs-8-ru',
-    title: 'Информатика. 8 класс',
+    id: 'kz-cs-8-ru', title: 'Информатика. 8 класс',
     authors: ['Балапанов Е.Х.', 'Бөрібаев Б.'],
-    description: 'Учебник информатики для 8 класса. Программирование на Pascal/Python, алгоритмы сортировки, компьютерные сети.',
-    image: '',
+    description: 'Программирование на Pascal/Python, алгоритмы сортировки, компьютерные сети.',
     grade: 8, subject: 'Информатика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1103',
-    pageUrl: 'https://emektep.kz/catalog/books/8klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-cs-9-ru',
-    title: 'Информатика. 9 класс',
+    id: 'kz-cs-9-ru', title: 'Информатика. 9 класс',
     authors: ['Балапанов Е.Х.', 'Бөрібаев Б.'],
-    description: 'Учебник информатики для 9 класса. Объектно-ориентированное программирование, базы данных SQL, интернет-технологии.',
-    image: '',
+    description: 'ООП, базы данных SQL, интернет-технологии.',
     grade: 9, subject: 'Информатика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1104',
-    pageUrl: 'https://emektep.kz/catalog/books/9klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-cs-10-ru',
-    title: 'Информатика. 10 класс',
+    id: 'kz-cs-10-ru', title: 'Информатика. 10 класс',
     authors: ['Балапанов Е.Х.', 'Бөрібаев Б.'],
-    description: 'Учебник информатики для 10 класса. Программирование на Python, веб-разработка, машинное обучение (введение), кибербезопасность.',
-    image: '',
+    description: 'Python, веб-разработка, введение в машинное обучение, кибербезопасность.',
     grade: 10, subject: 'Информатика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1105',
-    pageUrl: 'https://emektep.kz/catalog/books/10klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
   {
-    id: 'kz-cs-11-ru',
-    title: 'Информатика. 11 класс',
+    id: 'kz-cs-11-ru', title: 'Информатика. 11 класс',
     authors: ['Балапанов Е.Х.', 'Бөрібаев Б.'],
-    description: 'Учебник информатики для 11 класса. Алгоритмы и структуры данных, сетевые технологии, проектная деятельность, ИИ.',
-    image: '',
+    description: 'Алгоритмы и структуры данных, сетевые технологии, ИИ.',
     grade: 11, subject: 'Информатика', language: 'Русский',
-    source: 'МОН РК / emektep.kz',
-    pdfUrl: 'https://emektep.kz/qr/1106',
-    pageUrl: 'https://emektep.kz/catalog/books/11klass',
-    hasPdf: true, price: 'Бесплатно', type: 'book', category: 'Казахстан. Школьная программа'
   },
-];
+].map(b => ({
+  ...b,
+  image: `https://okulyk.com/wp-content/themes/okulyk.com/favicon/ms-icon-144x144.png`,
+  price: 'Бесплатно',
+  type: 'book',
+  category: 'Казахстан. Школьная программа',
+  source: 'okulyk.com (МОН РК)',
+  // Прямая страница на okulyk.com — там можно читать онлайн или скачать PDF
+  pageUrl: okulykUrl(b.grade, b.subject),
+  hasPdf: false,    // редирект на okulyk.com, они сами дают PDF
+  readerUrl: null,
+  url: okulykUrl(b.grade, b.subject),
+}));
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -284,15 +189,8 @@ export async function GET(request: NextRequest) {
 
   let results = KZ_TEXTBOOKS;
 
-  if (grade) {
-    results = results.filter(b => b.grade === parseInt(grade));
-  }
-
-  if (subject) {
-    results = results.filter(b =>
-      b.subject.toLowerCase().includes(subject.toLowerCase())
-    );
-  }
+  if (grade) results = results.filter(b => b.grade === parseInt(grade));
+  if (subject) results = results.filter(b => b.subject.toLowerCase().includes(subject.toLowerCase()));
 
   if (query) {
     const q = query.toLowerCase();
@@ -304,9 +202,5 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({
-    books: results,
-    total: results.length,
-    source: 'Kazakhstan MES (МОН РК)',
-  });
+  return NextResponse.json({ books: results, total: results.length, source: 'okulyk.com (МОН РК)' });
 }

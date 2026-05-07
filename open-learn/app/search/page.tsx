@@ -22,6 +22,8 @@ interface SearchResult {
 }
 
 function BookActionButton({ item }: { item: SearchResult }) {
+  const isKz = item.category === 'Казахстан. Школьная программа';
+
   // Если есть readerUrl — открываем встроенный ридер
   if (item.hasFullText && item.readerUrl) {
     const readerHref = `/reader?src=${encodeURIComponent(item.readerUrl)}&title=${encodeURIComponent(item.title)}&back=${encodeURIComponent('/search')}`;
@@ -47,7 +49,21 @@ function BookActionButton({ item }: { item: SearchResult }) {
     );
   }
 
-  // Иначе — переход на внешнюю страницу
+  // Казахстанские учебники — ведём на okulyk.com
+  if (isKz) {
+    return (
+      <a
+        href={item.url || item.pageUrl || '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors text-sm font-medium whitespace-nowrap"
+      >
+        📗 На okulyk.com ↗
+      </a>
+    );
+  }
+
+  // Все остальные — переход на внешнюю страницу
   return (
     <a
       href={item.url || item.pageUrl || '#'}
