@@ -22,59 +22,81 @@ interface SearchResult {
 }
 
 function BookActionButton({ item }: { item: SearchResult }) {
-  const isKz = item.category === 'Казахстан. Школьная программа';
-
-  // Если есть readerUrl — открываем встроенный ридер
   if (item.hasFullText && item.readerUrl) {
     const readerHref = `/reader?src=${encodeURIComponent(item.readerUrl)}&title=${encodeURIComponent(item.title)}&back=${encodeURIComponent('/search')}`;
     return (
       <div className="flex flex-col gap-2 items-end">
-        <Link
-          href={readerHref}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium whitespace-nowrap"
-        >
+        <Link href={readerHref}
+          className="px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap"
+          style={{ background: 'var(--teal)', color: 'white' }}>
           📖 Читать
         </Link>
         {item.pageUrl && item.pageUrl !== item.readerUrl && (
-          <a
-            href={item.pageUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-zinc-400 hover:text-blue-500"
-          >
+          <a href={item.pageUrl} target="_blank" rel="noopener noreferrer"
+            className="text-xs hover:underline" style={{ color: 'var(--teal)' }}>
             На сайте ↗
           </a>
         )}
       </div>
     );
   }
-
-  // Казахстанские учебники — ведём на okulyk.com
-  if (isKz) {
-    return (
-      <a
-        href={item.url || item.pageUrl || '#'}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors text-sm font-medium whitespace-nowrap"
-      >
-        📗 На okulyk.com ↗
-      </a>
-    );
-  }
-
-  // Все остальные — переход на внешнюю страницу
   return (
-    <a
-      href={item.url || item.pageUrl || '#'}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium whitespace-nowrap"
-    >
+    <a href={item.url || item.pageUrl || '#'} target="_blank" rel="noopener noreferrer"
+      className="px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap"
+      style={{ background: 'var(--coral)', color: 'white' }}>
       Открыть ↗
     </a>
   );
 }
+
+function ResultCard({ item }: { item: SearchResult }) {
+  const isKZ = item.category?.includes('Казахстан');
+  return (
+    <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }}
+      className="rounded-2xl p-4 flex gap-4 hover:shadow-md hover:border-[var(--teal)] transition-all">
+      {/* Cover */}
+      <div className="w-14 h-20 rounded-xl shrink-0 flex items-center justify-center overflow-hidden"
+        style={{ background: isKZ ? 'var(--teal-pale)' : 'var(--coral-light)' }}>
+        {item.image
+          ? <img src={item.image} alt={item.title} className="w-full h-full object-cover rounded-xl" />
+          : <span className="text-2xl">{isKZ ? '📗' : item.type === 'book' ? '📚' : '🎓'}</span>
+        }
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          <h3 className="font-semibold text-sm truncate" style={{ color: 'var(--text)' }}>{item.title}</h3>
+          {item.grade && (
+            <span className="px-2 py-0.5 text-xs rounded-full font-medium"
+              style={{ background: 'var(--coral-light)', color: 'var(--coral-dark)' }}>
+              {item.grade} класс
+            </span>
+          )}
+          {item.hasFullText && (
+            <span className="px-2 py-0.5 text-xs rounded-full font-medium"
+              style={{ background: 'var(--teal-light)', color: 'var(--teal-dark)' }}>
+              Читать онлайн
+            </span>
+          )}
+        </div>
+        {item.authors?.length > 0 && (
+          <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>{item.authors.join(', ')}</p>
+        )}
+        <p className="text-xs line-clamp-2" style={{ color: 'var(--text-muted)' }}>{item.description}</p>
+        <p className="text-xs mt-1.5 font-medium" style={{ color: 'var(--gray-dark)' }}>
+          {item.source}
+        </p>
+      </div>
+
+      <div className="shrink-0 flex flex-col justify-between items-end gap-2">
+        <span className="text-xs font-bold" style={{ color: 'var(--teal)' }}>{item.price}</span>
+        <BookActionButton item={item} />
+      </div>
+    </div>
+  );
+}
+
+const HINTS = ['физика', 'математика', 'информатика', 'python', 'биология'];
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
@@ -82,157 +104,139 @@ export default function SearchPage() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const searchBooks = async (searchQuery: string, searchType: string) => {
+  const searchBooks = async (q: string, t: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/books/search?q=${encodeURIComponent(searchQuery)}&type=${searchType}`);
-      const data = await response.json();
+      const res = await fetch(`/api/books/search?q=${encodeURIComponent(q)}&type=${t}`);
+      const data = await res.json();
       setResults(data.results || []);
-    } catch (error) {
-      console.error('Search error:', error);
-      setResults([]);
-    }
+    } catch { setResults([]); }
     setLoading(false);
   };
 
   useEffect(() => {
     if (query.length > 2) {
-      const timeoutId = setTimeout(() => { searchBooks(query, type); }, 500);
-      return () => clearTimeout(timeoutId);
-    } else if (query.length === 0) {
-      setResults([]);
-    }
+      const id = setTimeout(() => searchBooks(query, type), 500);
+      return () => clearTimeout(id);
+    } else if (query.length === 0) setResults([]);
   }, [query, type]);
 
   const kzResults = results.filter(r => r.category === 'Казахстан. Школьная программа');
   const globalResults = results.filter(r => r.category !== 'Казахстан. Школьная программа');
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-8">
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">Поиск курсов и книг</h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Казахстанские учебники (5–11 кл.) + мировые книги по программированию и науке
-          </p>
-        </div>
+    <div className="w-full max-w-5xl mx-auto px-5 py-8 space-y-7">
 
-        {/* Search */}
-        <div className="bg-white dark:bg-zinc-900 rounded-lg p-6 space-y-4">
+      {/* Title */}
+      <div>
+        <h1 className="text-3xl font-bold mb-1" style={{ color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
+          Поиск книг
+        </h1>
+        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          Казахстанские учебники (5–11 кл.) + мировые книги по программированию и науке
+        </p>
+      </div>
+
+      {/* Search box */}
+      <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }}
+        className="rounded-2xl p-5 space-y-4">
+        <div className="relative">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" fill="none"
+            stroke="var(--teal)" strokeWidth="2.2" strokeLinecap="round" viewBox="0 0 20 20">
+            <circle cx="8.5" cy="8.5" r="5.5"/><path d="M18 18l-4-4"/>
+          </svg>
           <input
             type="text"
-            placeholder="Например: математика 9 класс, физика, python, алгоритмы..."
+            placeholder="Математика 9 класс, физика, python..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full px-4 py-3 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+            onChange={e => setQuery(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 rounded-xl text-sm font-medium outline-none"
+            style={{
+              background: 'var(--bg)',
+              border: '1.5px solid var(--gray-mid)',
+              color: 'var(--text)',
+              fontSize: '14px',
+            }}
           />
-          <div className="flex flex-wrap gap-3 items-center">
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value as 'all' | 'book' | 'course')}
-              className="px-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50"
-            >
-              <option value="all">Все материалы</option>
-              <option value="book">Только книги</option>
-            </select>
-            <button
-              onClick={() => searchBooks(query, type)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-            >
-              Искать
-            </button>
-            <div className="flex gap-2 ml-auto flex-wrap">
-              {['физика', 'математика', 'информатика', 'python', 'алгоритмы'].map(hint => (
-                <button
-                  key={hint}
-                  onClick={() => setQuery(hint)}
-                  className="px-3 py-1 text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
-                >
-                  {hint}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="text-center py-8">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-zinc-600 dark:text-zinc-400">Поиск...</p>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <select value={type} onChange={e => setType(e.target.value as any)}
+            className="px-3 py-2 rounded-xl text-sm font-medium outline-none"
+            style={{ background: 'var(--bg)', border: '1.5px solid var(--gray-mid)', color: 'var(--text)' }}>
+            <option value="all">Все материалы</option>
+            <option value="book">Только книги</option>
+          </select>
 
-        {/* No results */}
-        {!loading && results.length === 0 && query.length > 2 && (
-          <div className="text-center py-8">
-            <p className="text-zinc-600 dark:text-zinc-400">Ничего не найдено по запросу «{query}»</p>
-          </div>
-        )}
+          <button onClick={() => searchBooks(query, type)}
+            style={{ background: 'var(--teal)', color: 'white' }}
+            className="px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90">
+            Искать
+          </button>
 
-        {/* KZ Textbooks section */}
-        {!loading && kzResults.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-3 flex items-center gap-2">
-              🇰🇿 Казахстанские учебники
-              <span className="text-sm font-normal text-zinc-500">(МОН РК, 5–11 класс)</span>
-            </h2>
-            <div className="space-y-3">
-              {kzResults.map(item => <ResultCard key={item.id} item={item} />)}
-            </div>
+          <div className="flex gap-2 flex-wrap ml-auto">
+            {HINTS.map(h => (
+              <button key={h} onClick={() => setQuery(h)}
+                className="px-3 py-1.5 text-xs rounded-full font-medium hover:opacity-80 transition"
+                style={{ background: 'var(--gray)', color: 'var(--text-muted)' }}>
+                {h}
+              </button>
+            ))}
           </div>
-        )}
-
-        {/* Global books section */}
-        {!loading && globalResults.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 mb-3 flex items-center gap-2">
-              🌐 Книги и ресурсы
-            </h2>
-            <div className="space-y-3">
-              {globalResults.map(item => <ResultCard key={item.id} item={item} />)}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ResultCard({ item }: { item: SearchResult }) {
-  return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg p-5 flex gap-4 hover:shadow-md transition-shadow border border-zinc-100 dark:border-zinc-800">
-      <div className="w-16 h-20 bg-linear-to-br from-blue-400 to-purple-500 rounded-lg shrink-0 flex items-center justify-center overflow-hidden">
-        {item.image ? (
-          <img src={item.image} alt={item.title} className="w-full h-full object-cover rounded-lg" />
-        ) : (
-          <span className="text-white text-2xl">{item.category?.includes('Казахстан') ? '📗' : item.type === 'book' ? '📚' : '🎓'}</span>
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex flex-wrap items-center gap-2 mb-1">
-          <h3 className="font-semibold text-zinc-900 dark:text-zinc-50 truncate">{item.title}</h3>
-          {item.grade && (
-            <span className="px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full shrink-0">
-              {item.grade} класс
-            </span>
-          )}
-          {item.hasFullText && (
-            <span className="px-2 py-0.5 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full shrink-0">
-              Читать онлайн
-            </span>
-          )}
         </div>
-        {item.authors?.length > 0 && (
-          <p className="text-xs text-zinc-500 mb-1">{item.authors.join(', ')}</p>
-        )}
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2">{item.description}</p>
-        <p className="text-xs text-zinc-400 mt-1">Источник: {item.source}</p>
       </div>
-      <div className="shrink-0 flex flex-col justify-between items-end">
-        <span className="text-sm font-bold text-blue-600">{item.price}</span>
-        <BookActionButton item={item} />
-      </div>
+
+      {/* Loading */}
+      {loading && (
+        <div className="text-center py-12">
+          <div className="inline-block w-8 h-8 rounded-full border-2 animate-spin"
+            style={{ borderColor: 'var(--teal-light)', borderTopColor: 'var(--teal)' }} />
+          <p className="mt-3 text-sm" style={{ color: 'var(--text-muted)' }}>Ищем...</p>
+        </div>
+      )}
+
+      {/* No results */}
+      {!loading && results.length === 0 && query.length > 2 && (
+        <div className="text-center py-12">
+          <p className="text-4xl mb-3">🔍</p>
+          <p className="font-semibold" style={{ color: 'var(--text)' }}>Ничего не найдено</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Попробуйте другой запрос</p>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!loading && results.length === 0 && query.length === 0 && (
+        <div className="text-center py-16">
+          <p className="text-5xl mb-4">📚</p>
+          <p className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Начните поиск</p>
+          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Введите название учебника или предмет</p>
+        </div>
+      )}
+
+      {/* KZ Results */}
+      {!loading && kzResults.length > 0 && (
+        <div>
+          <h2 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
+            🇰🇿 Казахстанские учебники
+            <span className="text-xs font-normal" style={{ color: 'var(--text-muted)' }}>МОН РК · 5–11 класс</span>
+          </h2>
+          <div className="space-y-3">
+            {kzResults.map(item => <ResultCard key={item.id} item={item} />)}
+          </div>
+        </div>
+      )}
+
+      {/* Global Results */}
+      {!loading && globalResults.length > 0 && (
+        <div>
+          <h2 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
+            🌐 Книги и ресурсы
+          </h2>
+          <div className="space-y-3">
+            {globalResults.map(item => <ResultCard key={item.id} item={item} />)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

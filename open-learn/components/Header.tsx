@@ -2,64 +2,84 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
+const NAV = [
+  { href: '/search',  label: 'Учебники' },
+  { href: '/about',   label: 'О проекте' },
+  { href: '/profile', label: 'Профиль' },
+];
+
 export default function Header({ onMenuClick }: HeaderProps) {
+  const pathname = usePathname();
+
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 z-40">
-      <div className="flex items-center justify-between h-16 px-4 md:px-8">
+    <header style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--gray)' }}
+      className="fixed top-0 left-0 right-0 z-40 shadow-sm">
+      <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
+
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-blue-600 dark:text-blue-400">
-          <div className="w-8 h-8 bg-linear-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-            OL
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div style={{ background: 'var(--teal)' }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M2 14 L9 3 L16 14" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M5 10 L13 10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
           </div>
-          <span>OpenLearn</span>
+          <span className="font-semibold text-lg tracking-tight" style={{ color: 'var(--text)' }}>
+            Open<span style={{ color: 'var(--teal)' }}>Learn</span>
+            <span style={{ color: 'var(--coral)' }}>.kz</span>
+          </span>
         </Link>
 
-        <div className="flex items-center gap-4">
-          <Link
-            href="/search"
-            className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-1">
+          {NAV.map(l => (
+            <Link key={l.href} href={l.href}
+              style={{
+                color: pathname === l.href ? 'var(--teal)' : 'var(--text-muted)',
+                background: pathname === l.href ? 'var(--teal-pale)' : 'transparent',
+              }}
+              className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--gray)] hover:text-[var(--text)]">
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* CTA */}
+        <div className="hidden md:flex items-center gap-3">
+          <Link href="/search"
+            style={{ background: 'var(--teal)', color: 'white' }}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold hover:opacity-90 shadow-sm">
+            <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <circle cx="8.5" cy="8.5" r="5.5"/><path d="M18 18l-4-4"/>
             </svg>
-            <span className="text-sm font-medium">Поиск</span>
+            Найти учебник
           </Link>
 
-          <Link
-            href="/profile"
-            className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-sm font-semibold">
-              U
-            </div>
-            <span className="text-sm font-medium hidden lg:inline">Профиль</span>
-          </Link>
-
-          <button
-            onClick={onMenuClick}
-            className="md:hidden flex flex-col gap-1.5 p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
-            aria-label="Toggle menu"
-          >
-            <div className="w-6 h-0.5 bg-zinc-800 dark:bg-zinc-200 rounded"></div>
-            <div className="w-6 h-0.5 bg-zinc-800 dark:bg-zinc-200 rounded"></div>
-            <div className="w-6 h-0.5 bg-zinc-800 dark:bg-zinc-200 rounded"></div>
-          </button>
-
-          <button
-            onClick={onMenuClick}
-            className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          {/* Burger for desktop sidebar */}
+          <button onClick={onMenuClick}
+            style={{ color: 'var(--text-muted)', border: '1.5px solid var(--gray)' }}
+            className="p-2 rounded-lg hover:bg-[var(--gray)] flex items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
             </svg>
-            <span className="text-sm font-medium">Меню</span>
           </button>
         </div>
+
+        {/* Mobile burger */}
+        <button onClick={onMenuClick}
+          className="md:hidden p-2 rounded-lg hover:bg-[var(--gray)]"
+          style={{ color: 'var(--text)' }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
       </div>
     </header>
   );
