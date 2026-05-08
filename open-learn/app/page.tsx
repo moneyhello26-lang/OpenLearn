@@ -18,10 +18,8 @@ export default function Home() {
   return (
     <div className="w-full">
 
-      {/* Hero */}
       <section style={{ background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)' }}
         className="relative overflow-hidden px-5 py-20 text-white">
-        {/* Декоративные круги */}
         <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full opacity-10"
           style={{ background: 'white' }} />
         <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-5"
