@@ -51,21 +51,22 @@ function BookActionButton({ item }: { item: SearchResult }) {
 
 function ResultCard({ item }: { item: SearchResult }) {
   const isKZ = item.category?.includes('Казахстан');
+  const detailHref = item.type === 'course' ? `/course/${item.id}` : `/details/${item.id}`;
   return (
     <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }}
       className="rounded-2xl p-4 flex gap-4 hover:shadow-md hover:border-[var(--teal)] transition-all">
       {/* Cover */}
-      <div className="w-14 h-20 rounded-xl shrink-0 flex items-center justify-center overflow-hidden"
+      <Link href={detailHref} className="w-14 h-20 rounded-xl shrink-0 flex items-center justify-center overflow-hidden"
         style={{ background: isKZ ? 'var(--teal-pale)' : 'var(--coral-light)' }}>
         {item.image
           ? <img src={item.image} alt={item.title} className="w-full h-full object-cover rounded-xl" />
           : <span className="text-2xl">{isKZ ? '📗' : item.type === 'book' ? '📚' : '🎓'}</span>
         }
-      </div>
+      </Link>
 
       <div className="flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-2 mb-1">
-          <h3 className="font-semibold text-sm truncate" style={{ color: 'var(--text)' }}>{item.title}</h3>
+          <Link href={detailHref} className="font-semibold text-sm truncate hover:text-[var(--teal)] transition-colors" style={{ color: 'var(--text)' }}>{item.title}</Link>
           {item.grade && (
             <span className="px-2 py-0.5 text-xs rounded-full font-medium"
               style={{ background: 'var(--coral-light)', color: 'var(--coral-dark)' }}>
@@ -76,6 +77,12 @@ function ResultCard({ item }: { item: SearchResult }) {
             <span className="px-2 py-0.5 text-xs rounded-full font-medium"
               style={{ background: 'var(--teal-light)', color: 'var(--teal-dark)' }}>
               Читать онлайн
+            </span>
+          )}
+          {item.type === 'course' && (
+            <span className="px-2 py-0.5 text-xs rounded-full font-medium"
+              style={{ background: 'var(--teal-pale)', color: 'var(--teal-dark)' }}>
+              🎓 Курс
             </span>
           )}
         </div>
@@ -90,7 +97,15 @@ function ResultCard({ item }: { item: SearchResult }) {
 
       <div className="shrink-0 flex flex-col justify-between items-end gap-2">
         <span className="text-xs font-bold" style={{ color: 'var(--teal)' }}>{item.price}</span>
-        <BookActionButton item={item} />
+        {item.type === 'course' ? (
+          <Link href={detailHref}
+            className="px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap"
+            style={{ background: 'var(--teal)', color: 'white' }}>
+            Подробнее →
+          </Link>
+        ) : (
+          <BookActionButton item={item} />
+        )}
       </div>
     </div>
   );

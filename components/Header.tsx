@@ -9,8 +9,9 @@ interface HeaderProps {
 }
 
 const NAV = [
-  { href: '/search',  label: 'Учебники' },
-  { href: '/about',   label: 'О проекте' },
+  { href: '/search',    label: 'Учебники' },
+  { href: '/favorites', label: '❤️ Избранное' },
+  { href: '/about',     label: 'О проекте' },
 ];
 
 export default function Header({ onMenuClick }: HeaderProps) {
