@@ -1,10 +1,12 @@
-// @ts-ignore - prisma package does not ship declaration files
-import type { PrismaConfig } from 'prisma'
+import "dotenv/config";
+import { defineConfig } from "prisma/config";
 
-export default {
-  earlyAccess: true,
-  schema: {
-    kind: 'single',
-    filePath: './prisma/schema.prisma',
+export default defineConfig({
+  schema: "prisma/schema.prisma",
+  migrations: {
+    path: "prisma/migrations",
   },
-} satisfies PrismaConfig
+  datasource: {
+    url: process.env.DATABASE_URL!,
+  },
+});
