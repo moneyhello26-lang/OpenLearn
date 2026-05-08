@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -11,11 +11,38 @@ interface HeaderProps {
 const NAV = [
   { href: '/search',  label: 'Учебники' },
   { href: '/about',   label: 'О проекте' },
-  { href: '/profile', label: 'Профиль' },
 ];
 
 export default function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      try { setUser(JSON.parse(stored)) } catch {}
+    }
+    const onStorage = () => {
+      const s = localStorage.getItem('user');
+      setUser(s ? JSON.parse(s) : null);
+    };
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('authChanged', onStorage);
+    return () => { window.removeEventListener('storage', onStorage); window.removeEventListener('authChanged', onStorage); };
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setShowUserMenu(false);
+    window.dispatchEvent(new Event('authChanged'));
+    router.push('/');
+  };
+
+  const initials = user?.name?.slice(0, 2).toUpperCase() || '';
 
   return (
     <header style={{ background: 'var(--surface)', borderBottom: '1.5px solid var(--gray)' }}
@@ -49,9 +76,19 @@ export default function Header({ onMenuClick }: HeaderProps) {
               {l.label}
             </Link>
           ))}
+          {user && (
+            <Link href="/profile"
+              style={{
+                color: pathname === '/profile' ? 'var(--teal)' : 'var(--text-muted)',
+                background: pathname === '/profile' ? 'var(--teal-pale)' : 'transparent',
+              }}
+              className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-[var(--gray)] hover:text-[var(--text)]">
+              Профиль
+            </Link>
+          )}
         </nav>
 
-        {/* CTA */}
+        {/* CTA / Auth */}
         <div className="hidden md:flex items-center gap-3">
           <Link href="/search"
             style={{ background: 'var(--teal)', color: 'white' }}
@@ -62,7 +99,73 @@ export default function Header({ onMenuClick }: HeaderProps) {
             Найти учебник
           </Link>
 
-          {/* Burger for desktop sidebar */}
+          {user ? (
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => setShowUserMenu(!showUserMenu)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  background: 'var(--teal-pale)', border: '1.5px solid var(--teal-light)',
+                  borderRadius: '12px', padding: '6px 12px 6px 6px',
+                  cursor: 'pointer', fontFamily: 'Sora, sans-serif',
+                }}>
+                <div style={{
+                  width: '30px', height: '30px', borderRadius: '8px',
+                  background: 'var(--teal)', color: 'white',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '12px', fontWeight: 700,
+                }}>{initials}</div>
+                <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>
+                  {user.name.split(' ')[0]}
+                </span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" strokeLinecap="round">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </button>
+
+              {showUserMenu && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                  background: 'var(--surface)', border: '1.5px solid var(--gray)',
+                  borderRadius: '14px', padding: '8px', minWidth: '180px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.1)', zIndex: 50,
+                }}>
+                  <div style={{ padding: '8px 12px 12px', borderBottom: '1px solid var(--gray)', marginBottom: '6px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>{user.name}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{user.email}</div>
+                  </div>
+                  <Link href="/profile" onClick={() => setShowUserMenu(false)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', fontSize: '13px', color: 'var(--text)', textDecoration: 'none' }}
+                    className="hover:bg-[var(--gray)]">
+                    👤 Мой профиль
+                  </Link>
+                  <button onClick={handleLogout}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: '8px', width: '100%',
+                      padding: '8px 12px', borderRadius: '8px', fontSize: '13px',
+                      color: 'var(--coral)', background: 'none', border: 'none',
+                      cursor: 'pointer', fontFamily: 'Sora, sans-serif', textAlign: 'left',
+                    }}
+                    className="hover:bg-[var(--coral-light)]">
+                    🚪 Выйти
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Link href="/auth"
+                style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 600, color: 'var(--text-muted)', border: '1.5px solid var(--gray)', textDecoration: 'none' }}
+                className="hover:bg-[var(--gray)]">
+                Войти
+              </Link>
+              <Link href="/auth"
+                style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, background: 'var(--coral)', color: 'white', textDecoration: 'none' }}
+                className="hover:opacity-90">
+                Регистрация
+              </Link>
+            </div>
+          )}
+
           <button onClick={onMenuClick}
             style={{ color: 'var(--text-muted)', border: '1.5px solid var(--gray)' }}
             className="p-2 rounded-lg hover:bg-[var(--gray)] flex items-center justify-center">
@@ -73,9 +176,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
         </div>
 
         {/* Mobile burger */}
-        <button onClick={onMenuClick}
-          className="md:hidden p-2 rounded-lg hover:bg-[var(--gray)]"
-          style={{ color: 'var(--text)' }}>
+        <button onClick={onMenuClick} className="md:hidden p-2 rounded-lg hover:bg-[var(--gray)]" style={{ color: 'var(--text)' }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
