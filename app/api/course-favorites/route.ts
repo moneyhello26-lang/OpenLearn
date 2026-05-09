@@ -3,10 +3,13 @@ import { prisma } from '@/lib/prisma'
 import { verifyRequestToken } from '@/lib/auth'
 import { handleApiError } from '@/lib/errors'
 
+// GET user's favorited courses
 export async function GET(request: NextRequest) {
   try {
     const user = verifyRequestToken(request)
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     const favorites = await prisma.courseFavorite.findMany({
       where: { userId: user.userId },
@@ -20,13 +23,18 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST toggle favorite (add if not exists, remove if exists)
 export async function POST(request: NextRequest) {
   try {
     const user = verifyRequestToken(request)
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     const { courseExtId, title, coverUrl, instructor } = await request.json()
-    if (!courseExtId) return NextResponse.json({ error: 'courseExtId required' }, { status: 400 })
+    if (!courseExtId) {
+      return NextResponse.json({ error: 'courseExtId is required' }, { status: 400 })
+    }
 
     const existing = await prisma.courseFavorite.findFirst({
       where: { userId: user.userId, courseExtId },

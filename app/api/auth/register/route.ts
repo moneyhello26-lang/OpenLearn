@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User already exists' },
+        { error: 'Пользователь с таким email уже существует' },
         { status: 400 }
       )
     }
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
         name: user.name,
       },
       token,
-    })
+    }, { status: 201 })
   } catch (error) {
     const { status, body } = handleApiError(error)
     return NextResponse.json(body, { status })

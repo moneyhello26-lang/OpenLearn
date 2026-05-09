@@ -3,11 +3,14 @@ import { prisma } from '@/lib/prisma'
 import { verifyRequestToken } from '@/lib/auth'
 import { handleApiError } from '@/lib/errors'
 
+// GET average rating for a course (public)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const courseExtId = searchParams.get('courseId')
-    if (!courseExtId) return NextResponse.json({ error: 'courseId required' }, { status: 400 })
+    if (!courseExtId) {
+      return NextResponse.json({ error: 'courseId is required' }, { status: 400 })
+    }
 
     const ratings = await prisma.courseRating.findMany({ where: { courseExtId } })
     const avg = ratings.length > 0
@@ -21,13 +24,18 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST set rating (requires auth, upsert)
 export async function POST(request: NextRequest) {
   try {
     const user = verifyRequestToken(request)
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
     const { courseExtId, score } = await request.json()
-    if (!courseExtId || !score) return NextResponse.json({ error: 'courseExtId and score required' }, { status: 400 })
+    if (!courseExtId || !score || score < 1 || score > 5) {
+      return NextResponse.json({ error: 'courseExtId and score (1-5) are required' }, { status: 400 })
+    }
 
     const rating = await prisma.courseRating.upsert({
       where: { userId_courseExtId: { userId: user.userId, courseExtId } },

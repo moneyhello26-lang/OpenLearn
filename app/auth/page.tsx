@@ -53,7 +53,13 @@ export default function AuthPage() {
         body: JSON.stringify(body),
       })
 
-      const data = await res.json()
+      let data: any = {}
+      try {
+        data = await res.json()
+      } catch {
+        setError('Ошибка сервера. Попробуйте позже.')
+        return
+      }
 
       if (!res.ok) {
         setError(data.error || 'Что-то пошло не так')

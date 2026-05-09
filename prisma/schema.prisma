@@ -1,5 +1,3 @@
-// This is your Prisma schema file
-
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
@@ -10,49 +8,49 @@ generator client {
 }
 
 model User {
-  id            String     @id @default(cuid())
-  email         String     @unique
+  id            String   @id @default(cuid())
+  email         String   @unique
   name          String
   password      String
   avatar        String?
   bio           String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  favorites         Favorite[]
-  courseFavorites   CourseFavorite[]
-  readingHistory    ReadingHistory[]
-  ratings           Rating[]
-  courseRatings     CourseRating[]
-  comments          Comment[]
-  courseComments    CourseComment[]
-  courses           UserCourse[]
+  favorites      Favorite[]
+  courseFavorites CourseFavorite[]
+  readingHistory ReadingHistory[]
+  ratings        Rating[]
+  courseRatings  CourseRating[]
+  comments       Comment[]
+  courseComments CourseComment[]
+  courses        UserCourse[]
 
   @@map("users")
 }
 
 model Book {
-  id            String     @id @default(cuid())
+  id            String    @id @default(cuid())
   title         String
   author        String
   description   String?
   coverUrl      String?
-  isbn          String?    @unique
+  isbn          String?   @unique
   publishedDate DateTime?
   pageCount     Int?
-  language      String?    @default("en")
+  language      String?   @default("en")
   source        String
   sourceId      String
   downloadUrl   String?
-  rating        Float      @default(0)
-  reviewCount   Int        @default(0)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+  rating        Float     @default(0)
+  reviewCount   Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  favorites     Favorite[]
+  favorites      Favorite[]
   readingHistory ReadingHistory[]
-  ratings       Rating[]
-  comments      Comment[]
+  ratings        Rating[]
+  comments       Comment[]
 
   @@unique([source, sourceId])
   @@index([title])
@@ -64,10 +62,6 @@ model Favorite {
   id      String   @id @default(cuid())
   userId  String
   bookId  String
-  title   String   @default("")
-  coverUrl String? 
-  source  String   @default("")
-  bookExtId String @default("")
   addedAt DateTime @default(now())
 
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -80,16 +74,15 @@ model Favorite {
 }
 
 model CourseFavorite {
-  id        String   @id @default(cuid())
-  userId    String
+  id          String   @id @default(cuid())
+  userId      String
   courseExtId String
-  title     String
-  coverUrl  String?
-  instructor String  @default("")
-  addedAt   DateTime @default(now())
+  title       String   @default("")
+  coverUrl    String?
+  instructor  String   @default("")
+  addedAt     DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course    Course?  @relation(fields: [courseExtId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseExtId])
   @@index([userId])
@@ -135,14 +128,14 @@ model Rating {
 }
 
 model CourseRating {
-  id        String   @id @default(cuid())
-  userId    String
+  id          String   @id @default(cuid())
+  userId      String
   courseExtId String
-  score     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  score       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseExtId])
   @@index([userId])
@@ -170,16 +163,16 @@ model Comment {
 }
 
 model CourseComment {
-  id          String          @id @default(cuid())
+  id          String         @id @default(cuid())
   userId      String
   courseExtId String
   content     String
   parentId    String?
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 
-  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parent      CourseComment?  @relation("CourseCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent      CourseComment? @relation("CourseCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies     CourseComment[] @relation("CourseCommentReplies")
 
   @@index([userId])
@@ -189,20 +182,19 @@ model CourseComment {
 }
 
 model Course {
-  id          String         @id @default(cuid())
+  id          String       @id @default(cuid())
   title       String
   description String?
   coverUrl    String?
   instructor  String
   duration    Int?
-  level       String         @default("beginner")
-  rating      Float          @default(0)
-  reviewCount Int            @default(0)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  level       String       @default("beginner")
+  rating      Float        @default(0)
+  reviewCount Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
-  users           UserCourse[]
-  favorites       CourseFavorite[]
+  users       UserCourse[]
 
   @@index([title])
   @@map("courses")

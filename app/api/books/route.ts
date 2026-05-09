@@ -45,7 +45,18 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(book, { status: 201 })
   } catch (error: any) {
+    // Race condition: two concurrent requests tried to create the same book
+    // Return the existing book so the caller can still get its ID
     if (error.code === 'P2002') {
+      try {
+        const { source, sourceId } = await request.json().catch(() => ({}))
+        if (source && sourceId) {
+          const existingBook = await prisma.book.findUnique({
+            where: { source_sourceId: { source, sourceId } },
+          })
+          if (existingBook) return NextResponse.json(existingBook)
+        }
+      } catch {}
       return NextResponse.json(
         { error: 'Book already exists' },
         { status: 400 }
