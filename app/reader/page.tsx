@@ -19,14 +19,12 @@ function ReaderContent() {
     );
   }
 
-  // Определяем тип источника
   const isArchive = src.includes('archive.org');
   const isPdf = src.toLowerCase().includes('.pdf') || src.includes('emektep.kz/qr');
   const isHtml = src.startsWith('http') && !isPdf && !isArchive;
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Header */}
       <div className="flex items-center gap-4 px-4 py-3 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-700 shrink-0">
         <Link
           href={back}
@@ -47,7 +45,6 @@ function ReaderContent() {
         </a>
       </div>
 
-      {/* Reader area */}
       <div className="flex-1 bg-zinc-100 dark:bg-zinc-950">
         {(isPdf || isArchive) ? (
           <iframe

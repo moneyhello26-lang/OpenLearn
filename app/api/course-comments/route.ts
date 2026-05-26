@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { verifyRequestToken } from '@/lib/auth'
 import { handleApiError } from '@/lib/errors'
 
-// GET all comments for a course (visible to everyone)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -31,7 +30,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST a comment or reply (requires auth)
 export async function POST(request: NextRequest) {
   try {
     const user = verifyRequestToken(request)

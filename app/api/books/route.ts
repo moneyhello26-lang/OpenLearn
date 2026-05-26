@@ -26,8 +26,6 @@ export async function POST(request: NextRequest) {
     if (existingBook) {
       return NextResponse.json(existingBook)
     }
-
-    const book = await prisma.book.create({
       data: {
         title,
         author,
@@ -45,8 +43,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(book, { status: 201 })
   } catch (error: any) {
-    // Race condition: two concurrent requests tried to create the same book
-    // Return the existing book so the caller can still get its ID
     if (error.code === 'P2002') {
       try {
         const { source, sourceId } = await request.json().catch(() => ({}))

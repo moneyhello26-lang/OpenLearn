@@ -23,10 +23,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if book exists
-    const book = await prisma.book.findUnique({
-      where: { id: bookId },
-    })
+    const progress = totalPages ? (currentPage / totalPages) * 100 : 0
 
     if (!book) {
       return NextResponse.json(

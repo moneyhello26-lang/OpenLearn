@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('q') || 'physics';
-  const apiKey = process.env.SPRINGER_API_KEY; // Нужно получить API ключ после регистрации
+  const apiKey = process.env.SPRINGER_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json({

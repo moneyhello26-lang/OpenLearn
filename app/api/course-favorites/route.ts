@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { verifyRequestToken } from '@/lib/auth'
 import { handleApiError } from '@/lib/errors'
 
-// GET user's favorited courses
 export async function GET(request: NextRequest) {
   try {
     const user = verifyRequestToken(request)
@@ -23,7 +22,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST toggle favorite (add if not exists, remove if exists)
 export async function POST(request: NextRequest) {
   try {
     const user = verifyRequestToken(request)

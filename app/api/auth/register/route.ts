@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     })
@@ -26,7 +25,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Hash password and create user
     const hashedPassword = await hashPassword(password)
     const user = await prisma.user.create({
       data: {
@@ -36,7 +34,6 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Generate token
     const token = generateToken(user.id, user.email)
 
     return NextResponse.json({

@@ -19,7 +19,6 @@ export async function DELETE(
 
     const { favoriteId } = await params
 
-    // Verify ownership
     const favorite = await prisma.favorite.findUnique({
       where: { id: favoriteId },
     })

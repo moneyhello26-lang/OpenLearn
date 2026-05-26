@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Источник: okulyk.com — живой сайт с актуальными учебниками МОН РК
-// Структура URL: https://okulyk.com/{grade}-klass/{subject}-{grade}/
-// hasPdf: false — у них нет прямых PDF-ссылок, только страница на сайте
-
 const subjectSlug: Record<string, string> = {
   'Математика': 'matematika',
   'Алгебра': 'algebra',
@@ -18,8 +14,6 @@ function okulykUrl(grade: number, subjectKey: string) {
 }
 
 const KZ_TEXTBOOKS = [
-  // ===== МАТЕМАТИКА 5-6 =====
-  {
     id: 'kz-math-5-ru', title: 'Математика. 5 класс',
     authors: ['Акпаева А.Б.', 'Ибраева А.Т.'],
     description: 'Учебник математики для 5 класса общеобразовательных школ Казахстана. Натуральные числа, дроби, проценты, геометрические фигуры.',
@@ -31,7 +25,6 @@ const KZ_TEXTBOOKS = [
     description: 'Рациональные числа, пропорции, уравнения, геометрия.',
     grade: 6, subject: 'Математика', language: 'Русский',
   },
-  // ===== АЛГЕБРА =====
   {
     id: 'kz-algebra-7-ru', title: 'Алгебра. 7 класс',
     authors: ['Абылкасымова А.Е.', 'Жумагулов Б.Т.'],

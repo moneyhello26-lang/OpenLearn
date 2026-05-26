@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { verifyRequestToken } from '@/lib/auth'
 import { handleApiError } from '@/lib/errors'
 
-// GET average rating for a course (public)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -24,7 +23,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST set rating (requires auth, upsert)
 export async function POST(request: NextRequest) {
   try {
     const user = verifyRequestToken(request)

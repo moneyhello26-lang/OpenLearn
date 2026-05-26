@@ -24,7 +24,7 @@ export function handleApiError(error: unknown) {
     }
   }
 
-  console.error('Unexpected error:', error)
+  console.error(error)
   return {
     status: 500,
     body: { error: 'Internal server error' },

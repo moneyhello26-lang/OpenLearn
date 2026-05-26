@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { handleApiError } from '@/lib/errors'
 
-// Get book details with ratings and comments
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ bookId: string }> }

@@ -27,7 +27,6 @@ function parseBookId(id: string) {
 
 function Stars({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
   const [hover, setHover] = useState(0);
-  const ro = !onChange;
   return (
     <div style={{ display: 'flex', gap: '2px' }}>
       {[1,2,3,4,5].map(s => (
@@ -190,7 +189,6 @@ export default function DetailsPage() {
     } catch {}
   }, []);
 
-  // Ensure book is in DB and return its id
   const ensureBook = useCallback(async (book: BookEdition): Promise<string | null> => {
     try {
       const res = await fetch('/api/books', {
@@ -210,7 +208,6 @@ export default function DetailsPage() {
     return null;
   }, [id]);
 
-  // Fetch book data from external API
   useEffect(() => {
     const fetch_ = async () => {
       setLoading(true);
@@ -267,7 +264,6 @@ export default function DetailsPage() {
           if (token) checkFavorite(bid, token);
         }
 
-        // Load editions in background
         setSearchingEditions(true);
         const titleQ = book.title.replace(/\.\s*\d+\s*класс.*/i,'').replace(/\(.*?\)/g,'').trim();
         const results: BookEdition[] = [];

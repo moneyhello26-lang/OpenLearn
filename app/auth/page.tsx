@@ -24,7 +24,7 @@ export default function AuthPage() {
     setError('')
     setSuccess('')
 
-    // Basic validation
+
     if (!formData.email || !formData.password) {
       setError('Заполните все обязательные поля')
       setLoading(false)
@@ -82,7 +82,6 @@ export default function AuthPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
 
-      {/* Card */}
       <div style={{
         width: '100%', maxWidth: '440px',
         background: 'var(--surface)',
@@ -92,12 +91,10 @@ export default function AuthPage() {
         overflow: 'hidden',
       }}>
 
-        {/* Top accent */}
         <div style={{ height: '4px', background: 'linear-gradient(90deg, var(--teal), var(--teal-dark))' }} />
 
         <div style={{ padding: '36px' }}>
 
-          {/* Logo */}
           <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
               <div style={{ background: 'var(--teal)', width: '40px', height: '40px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -116,7 +113,7 @@ export default function AuthPage() {
             </p>
           </div>
 
-          {/* Toggle */}
+
           <div style={{ display: 'flex', background: 'var(--gray)', borderRadius: '12px', padding: '4px', marginBottom: '24px' }}>
             {[{ key: true, label: 'Войти' }, { key: false, label: 'Регистрация' }].map(({ key, label }) => (
               <button key={String(key)} onClick={() => { setIsLogin(key); setError(''); setSuccess('') }}
@@ -141,7 +138,6 @@ export default function AuthPage() {
             </div>
           )}
 
-          {/* Success */}
           {success && (
             <div style={{ background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '16px' }}>✅</span>
@@ -149,10 +145,8 @@ export default function AuthPage() {
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit}>
 
-            {/* Name (register only) */}
             {!isLogin && (
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text)', marginBottom: '6px' }}>
@@ -182,7 +176,6 @@ export default function AuthPage() {
               </div>
             )}
 
-            {/* Email */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text)', marginBottom: '6px' }}>
                 Email

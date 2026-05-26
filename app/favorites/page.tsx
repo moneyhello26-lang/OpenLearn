@@ -76,7 +76,6 @@ export default function FavoritesPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 20px' }}>
 
-        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px', marginBottom: '28px' }}>
           <div>
             <h1 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--text)', fontFamily: 'DM Serif Display, serif', marginBottom: '4px' }}>❤️ Избранное</h1>
@@ -87,7 +86,6 @@ export default function FavoritesPage() {
           </Link>
         </div>
 
-        {/* Tabs */}
         <div style={{ display: 'flex', gap: '4px', marginBottom: '24px', background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '14px', padding: '4px', width: 'fit-content' }}>
           {(['books','courses'] as Tab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
@@ -97,7 +95,6 @@ export default function FavoritesPage() {
           ))}
         </div>
 
-        {/* Books */}
         {tab === 'books' && (
           books.length === 0
           ? (
@@ -115,7 +112,6 @@ export default function FavoritesPage() {
                   style={{ display: 'flex', gap: '16px', background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '16px', padding: '16px', alignItems: 'flex-start' }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--teal)'; el.style.boxShadow = '0 4px 16px rgba(61,174,183,0.1)'; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--gray)'; el.style.boxShadow = 'none'; }}>
-                  {/* Cover */}
                   <div style={{ width: '64px', height: '90px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: 'var(--coral-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
                     {fav.book.coverUrl ? <img src={fav.book.coverUrl} alt={fav.book.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '📚'}
                   </div>
@@ -144,7 +140,7 @@ export default function FavoritesPage() {
           )
         )}
 
-        {/* Courses */}
+
         {tab === 'courses' && (
           courses.length === 0
           ? (

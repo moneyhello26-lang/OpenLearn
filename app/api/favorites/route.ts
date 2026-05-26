@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if book exists
+
     const book = await prisma.book.findUnique({
       where: { id: bookId },
     })
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Add to favorites
+
     const favorite = await prisma.favorite.create({
       data: {
         userId: user.userId,

@@ -39,7 +39,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Stats */}
         <section className="rounded-lg p-12" style={{ background: 'var(--teal-pale)' }}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>

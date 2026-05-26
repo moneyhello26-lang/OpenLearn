@@ -21,13 +21,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm"
           onClick={onClose} />
       )}
 
-      {/* Panel */}
       <aside
         style={{
           background: 'var(--surface)',
@@ -37,7 +35,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         }}
         className="fixed top-16 right-0 bottom-0 w-64 z-30 flex flex-col">
 
-        {/* Nav */}
         <nav className="p-4 flex-1 space-y-1">
           {navItems.map(item => (
             <Link key={item.href} href={item.href} onClick={onClose}
@@ -53,13 +50,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        {/* SDG badge */}
         <div className="mx-4 mb-4 p-3 rounded-xl" style={{ background: 'var(--teal-pale)', border: '1px solid var(--teal-light)' }}>
           <p className="text-xs font-semibold" style={{ color: 'var(--teal-dark)' }}>🌱 ЦУР 4</p>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Качественное образование для каждого</p>
         </div>
 
-        {/* Footer */}
         <div className="p-4 border-t" style={{ borderColor: 'var(--gray)' }}>
           <button style={{ background: 'var(--coral-light)', color: 'var(--coral-dark)' }}
             className="w-full py-2.5 px-4 rounded-xl text-sm font-semibold hover:opacity-80">

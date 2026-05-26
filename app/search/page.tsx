@@ -55,7 +55,6 @@ function ResultCard({ item }: { item: SearchResult }) {
   return (
     <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }}
       className="rounded-2xl p-4 flex gap-4 hover:shadow-md hover:border-[var(--teal)] transition-all">
-      {/* Cover */}
       <Link href={detailHref} className="w-14 h-20 rounded-xl shrink-0 flex items-center justify-center overflow-hidden"
         style={{ background: isKZ ? 'var(--teal-pale)' : 'var(--coral-light)' }}>
         {item.image
@@ -142,7 +141,6 @@ export default function SearchPage() {
   return (
     <div className="w-full max-w-5xl mx-auto px-5 py-8 space-y-7">
 
-      {/* Title */}
       <div>
         <h1 className="text-3xl font-bold mb-1" style={{ color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
           Поиск книг
@@ -152,7 +150,6 @@ export default function SearchPage() {
         </p>
       </div>
 
-      {/* Search box */}
       <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }}
         className="rounded-2xl p-5 space-y-4">
         <div className="relative">
@@ -201,7 +198,6 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {/* Loading */}
       {loading && (
         <div className="text-center py-12">
           <div className="inline-block w-8 h-8 rounded-full border-2 animate-spin"
@@ -210,7 +206,6 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* No results */}
       {!loading && results.length === 0 && query.length > 2 && (
         <div className="text-center py-12">
           <p className="text-4xl mb-3">🔍</p>
@@ -219,7 +214,6 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Empty state */}
       {!loading && results.length === 0 && query.length === 0 && (
         <div className="text-center py-16">
           <p className="text-5xl mb-4">📚</p>
@@ -228,7 +222,7 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* KZ Results */}
+
       {!loading && kzResults.length > 0 && (
         <div>
           <h2 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
@@ -241,7 +235,7 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Global Results */}
+
       {!loading && globalResults.length > 0 && (
         <div>
           <h2 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>

@@ -55,7 +55,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats */}
       <section className="max-w-5xl mx-auto px-5 -mt-8 mb-16 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats.map((s, i) => (
@@ -69,7 +68,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Categories */}
       <section className="max-w-5xl mx-auto px-5 mb-16">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Предметы</h2>
@@ -88,7 +86,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured */}
       <section className="max-w-5xl mx-auto px-5 mb-16">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Популярные учебники</h2>
@@ -128,7 +125,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SDG CTA */}
       <section className="max-w-5xl mx-auto px-5 mb-16">
         <div className="rounded-3xl p-10 text-center"
           style={{ background: 'linear-gradient(135deg, var(--coral-light) 0%, var(--teal-pale) 100%)', border: '1.5px solid var(--gray)' }}>

@@ -50,7 +50,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
       className="fixed top-0 left-0 right-0 z-40 shadow-sm">
       <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
 
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
           <div style={{ background: 'var(--teal)' }}
             className="w-9 h-9 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
@@ -65,7 +64,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </span>
         </Link>
 
-        {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1">
           {NAV.map(l => (
             <Link key={l.href} href={l.href}
@@ -89,7 +87,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
           )}
         </nav>
 
-        {/* CTA / Auth */}
         <div className="hidden md:flex items-center gap-3">
           <Link href="/search"
             style={{ background: 'var(--teal)', color: 'white' }}
@@ -176,7 +173,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </button>
         </div>
 
-        {/* Mobile burger */}
         <button onClick={onMenuClick} className="md:hidden p-2 rounded-lg hover:bg-[var(--gray)]" style={{ color: 'var(--text)' }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>

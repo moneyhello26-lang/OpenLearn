@@ -53,7 +53,6 @@ const MOCK_COURSES: CourseDetails[] = [
   },
 ];
 
-// ---- Star rating component ----
 function Stars({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
   const [hover, setHover] = useState(0);
   const readonly = !onChange;
@@ -72,7 +71,6 @@ function Stars({ value, onChange }: { value: number; onChange?: (v: number) => v
   );
 }
 
-// ---- Single comment block ----
 function CommentBlock({ comment, authUser, courseId, onRefresh }: {
   comment: CommentItem;
   authUser: { token: string; name: string } | null;
@@ -102,7 +100,6 @@ function CommentBlock({ comment, authUser, courseId, onRefresh }: {
 
   return (
     <div style={{ marginBottom: '14px' }}>
-      {/* Main comment */}
       <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '14px', padding: '14px 16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
           <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, var(--teal), var(--coral))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '13px', flexShrink: 0 }}>
@@ -122,7 +119,6 @@ function CommentBlock({ comment, authUser, courseId, onRefresh }: {
         )}
       </div>
 
-      {/* Replies */}
       {comment.replies.length > 0 && (
         <div style={{ marginLeft: '24px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {comment.replies.map(r => {
@@ -142,7 +138,6 @@ function CommentBlock({ comment, authUser, courseId, onRefresh }: {
         </div>
       )}
 
-      {/* Reply form */}
       {showReply && (
         <div style={{ marginLeft: '24px', marginTop: '8px' }}>
           <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Ваш ответ..." rows={2}
@@ -157,7 +152,6 @@ function CommentBlock({ comment, authUser, courseId, onRefresh }: {
   );
 }
 
-// ---- Main page ----
 export default function CourseDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -178,7 +172,6 @@ export default function CourseDetailsPage() {
 
   const [authUser, setAuthUser] = useState<{ userId: string; name: string; token: string } | null>(null);
 
-  // Load auth from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('user');
     const token = localStorage.getItem('token');
@@ -190,14 +183,12 @@ export default function CourseDetailsPage() {
     }
   }, []);
 
-  // Load course data
   useEffect(() => {
     const found = MOCK_COURSES.find(c => c.id === id) || null;
     setCourse(found);
     setLoading(false);
   }, [id]);
 
-  // Load comments from server
   const loadComments = useCallback(async () => {
     setCommentsLoading(true);
     try {
@@ -210,7 +201,6 @@ export default function CourseDetailsPage() {
     setCommentsLoading(false);
   }, [id]);
 
-  // Load ratings from server
   const loadRatings = useCallback(async () => {
     try {
       const res = await fetch(`/api/course-ratings?courseId=${encodeURIComponent(id)}`);
@@ -222,7 +212,6 @@ export default function CourseDetailsPage() {
     } catch (e) { console.error('loadRatings', e); }
   }, [id]);
 
-  // Check if already favorited
   const checkFavorite = useCallback(async (token: string) => {
     try {
       const res = await fetch('/api/course-favorites', {
@@ -246,7 +235,6 @@ export default function CourseDetailsPage() {
     if (token) checkFavorite(token);
   }, [checkFavorite]);
 
-  // Toggle favorite
   const toggleFavorite = async () => {
     const token = localStorage.getItem('token');
     if (!token) { router.push('/auth'); return; }
@@ -266,7 +254,6 @@ export default function CourseDetailsPage() {
     setFavBusy(false);
   };
 
-  // Submit comment + rating
   const submitComment = async () => {
     if (!newText.trim()) return;
     const token = localStorage.getItem('token');
@@ -279,7 +266,6 @@ export default function CourseDetailsPage() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ courseExtId: id, score: userRating }),
       });
-      // 2. Save comment
       const res = await fetch('/api/course-comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -320,7 +306,6 @@ export default function CourseDetailsPage() {
 
         <Link href="/search" style={{ color: 'var(--teal)', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}>← Назад к поиску</Link>
 
-        {/* Cover card */}
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
           <div style={{ position: 'relative', height: '280px' }}>
             {course.image
@@ -348,22 +333,18 @@ export default function CourseDetailsPage() {
               )}
             </div>
 
-            {/* Buttons */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {/* Start course */}
               <button
                 onClick={() => alert('Начинаем курс! Первая лекция скоро будет доступна.')}
                 style={{ padding: '12px 28px', borderRadius: '12px', background: 'linear-gradient(135deg, var(--teal), var(--teal-dark))', color: 'white', fontWeight: 700, fontSize: '15px', border: 'none', cursor: 'pointer', boxShadow: '0 4px 14px rgba(61,174,183,0.35)', fontFamily: 'Sora, sans-serif' }}>
                 🚀 Начать курс
               </button>
 
-              {/* Favorite */}
               <button onClick={toggleFavorite} disabled={favBusy}
                 style={{ padding: '12px 20px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid', borderColor: isFavorite ? 'var(--coral)' : 'var(--gray)', background: isFavorite ? 'var(--coral-light)' : 'var(--surface)', color: isFavorite ? 'var(--coral-dark)' : 'var(--text-muted)', cursor: favBusy ? 'wait' : 'pointer', fontFamily: 'Sora, sans-serif', transition: 'all 0.2s' }}>
                 {isFavorite ? '❤️ В избранном' : '🤍 В избранное'}
               </button>
 
-              {/* Go to favorites */}
               <Link href="/favorites"
                 style={{ padding: '12px 18px', borderRadius: '12px', fontWeight: 600, fontSize: '14px', border: '1.5px solid var(--gray)', background: 'var(--surface)', color: 'var(--text-muted)', textDecoration: 'none', display: 'inline-block' }}>
                 📚 Моё избранное
@@ -372,13 +353,12 @@ export default function CourseDetailsPage() {
           </div>
         </div>
 
-        {/* Description */}
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '20px', padding: '24px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text)', marginBottom: '14px' }}>О курсе</h2>
           <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{course.description}</p>
         </div>
 
-        {/* Comments section */}
+
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '20px', padding: '24px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text)', marginBottom: '20px' }}>
             💬 Отзывы и комментарии

@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'
 import { verifyRequestToken } from '@/lib/auth'
 import { handleApiError } from '@/lib/errors'
 
-// Get all ratings for a book
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ bookId: string }> }
@@ -43,7 +42,6 @@ export async function GET(
   }
 }
 
-// Add or update rating
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ bookId: string }> }

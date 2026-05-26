@@ -2,7 +2,6 @@ export default function ProfilePage() {
   return (
     <div className="w-full max-w-5xl mx-auto px-5">
       <div className="space-y-6">
-        {/* Profile Header */}
         <div className="rounded-lg p-8" style={{ background: 'var(--surface)' }}>
           <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
             <div className="w-24 h-24 rounded-full flex items-center justify-center text-white text-4xl font-bold" style={{ background: 'linear-gradient(135deg, var(--teal), var(--coral))' }}>
@@ -41,7 +40,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* My Courses */}
         <div className="space-y-4">
           <h2 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Мои курсы</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
