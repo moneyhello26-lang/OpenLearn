@@ -1,147 +1,97 @@
+import Link from 'next/link';
+
 export default function Home() {
-  const stats = [
-    { value: '240+', label: 'Учебников' },
-    { value: '48',   label: 'Стипендий' },
-    { value: 'KZ·RU', label: 'Языки' },
-    { value: '0 ₸',  label: 'Стоимость' },
-  ];
-
-  const categories = [
-    { icon: '📐', label: 'Математика',  count: 42 },
-    { icon: '⚗️', label: 'Физика',      count: 28 },
-    { icon: '💻', label: 'Информатика', count: 35 },
-    { icon: '🧬', label: 'Биология',    count: 24 },
-    { icon: '🌍', label: 'История',     count: 31 },
-    { icon: '📖', label: 'Литература',  count: 19 },
-  ];
-
   return (
-    <div className="w-full">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Mesh Background */}
+      <div className="mesh-bg">
+        <div className="mesh-blob mesh-blob-1"></div>
+        <div className="mesh-blob mesh-blob-2"></div>
+        <div className="mesh-blob mesh-blob-3"></div>
+      </div>
 
-      <section style={{ background: 'linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%)' }}
-        className="relative overflow-hidden px-5 py-20 text-white">
-        <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full opacity-10"
-          style={{ background: 'white' }} />
-        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-5"
-          style={{ background: 'var(--coral)' }} />
-
-        <div className="relative max-w-4xl mx-auto text-center fade-up">
-          <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold mb-6 tracking-wide"
-            style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
-            🌱 ЦУР 4 — Качественное образование
-          </span>
-
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-5" style={{ fontFamily: 'DM Serif Display, serif' }}>
-            Знания<br/>
-            <span style={{ color: 'var(--coral-light)' }}>без барьеров</span>
-          </h1>
-
-          <p className="text-lg opacity-85 max-w-xl mx-auto mb-10 font-light leading-relaxed">
-            Бесплатные учебники, гайды по поступлению и стипендии для каждого казахстанца — без регистрации.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center fade-up fade-up-1">
-            <a href="/search"
-              style={{ background: 'var(--coral)', color: 'white' }}
-              className="px-8 py-3.5 rounded-2xl font-semibold hover:opacity-90 shadow-lg text-sm">
-              Найти учебник →
-            </a>
-            <a href="/about"
-              className="px-8 py-3.5 rounded-2xl font-semibold text-sm"
-              style={{ background: 'rgba(255,255,255,0.15)', border: '1.5px solid rgba(255,255,255,0.3)', color: 'white' }}>
-              О проекте
-            </a>
-          </div>
+      {/* Hero Section */}
+      <section className="relative z-10 pt-40 pb-24 px-6 max-w-6xl mx-auto text-center flex flex-col items-center">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] backdrop-blur-md mb-8 slide-up">
+          <span className="w-2 h-2 rounded-full bg-[var(--glow-accent)] animate-pulse"></span>
+          <span className="text-sm font-medium text-white opacity-80">OpenLearn AI 2.0 уже доступен</span>
+        </div>
+        
+        <h1 className="text-6xl md:text-8xl font-extrabold tracking-tighter mb-8 slide-up delay-1 max-w-4xl" style={{ lineHeight: '1.1' }}>
+          Образование.<br />
+          <span className="text-gradient-color">Новый стандарт.</span>
+        </h1>
+        
+        <p className="text-xl md:text-2xl text-muted max-w-2xl mx-auto mb-12 slide-up delay-2 leading-relaxed">
+          Бесплатные учебники, продвинутый ИИ-ассистент и персонализированные гайды по поступлению. Без ограничений.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row justify-center gap-5 slide-up delay-3">
+          <Link href="/search" className="btn-glow text-lg px-8 py-4">
+            Начать обучение
+          </Link>
+          <Link href="/ai-demo" className="btn-secondary text-lg px-8 py-4">
+            Встретить ИИ
+          </Link>
         </div>
       </section>
 
-      <section className="max-w-5xl mx-auto px-5 -mt-8 mb-16 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {stats.map((s, i) => (
-            <div key={s.label}
-              style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', animationDelay: `${i * 0.08}s` }}
-              className="rounded-2xl p-5 text-center shadow-sm fade-up">
-              <p className="text-2xl font-bold" style={{ color: 'var(--teal)' }}>{s.value}</p>
-              <p className="text-xs mt-1 font-medium" style={{ color: 'var(--text-muted)' }}>{s.label}</p>
+      {/* Bento Grid Section */}
+      <section className="relative z-10 py-24 px-6 max-w-6xl mx-auto">
+        <div className="text-center mb-16 slide-up">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">Всё в одной экосистеме.</h2>
+          <p className="text-xl text-muted">Разработано для максимальной фокусировки на знаниях.</p>
+        </div>
+        
+        {/* Bento Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 max-w-5xl mx-auto slide-up delay-1">
+          
+          {/* Card 1: Large Library (spans 2 cols) */}
+          <div className="bento-card md:col-span-2 p-8 flex flex-col justify-end min-h-[320px] relative group">
+            <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-500" style={{ background: 'radial-gradient(circle at top right, var(--glow-accent), transparent 60%)' }}></div>
+            <div className="relative z-10">
+              <div className="w-12 h-12 rounded-2xl glass-floating flex items-center justify-center text-2xl mb-6 shadow-lg border border-[rgba(255,255,255,0.1)]">📚</div>
+              <h3 className="text-2xl font-bold mb-3 text-white tracking-tight">Безграничная библиотека</h3>
+              <p className="text-muted text-lg max-w-md">Тысячи школьных учебников, методичек и научных трудов. В формате PDF и для онлайн-чтения. Мгновенный поиск.</p>
             </div>
-          ))}
+          </div>
+          
+          {/* Card 2: AI */}
+          <div className="bento-card p-8 flex flex-col justify-end min-h-[320px] relative group">
+            <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-500" style={{ background: 'radial-gradient(circle at bottom right, var(--glow-tertiary), transparent 60%)' }}></div>
+            <div className="relative z-10">
+              <div className="w-12 h-12 rounded-2xl glass-floating flex items-center justify-center text-2xl mb-6 shadow-lg">🤖</div>
+              <h3 className="text-2xl font-bold mb-3 text-white tracking-tight">AI Ассистент</h3>
+              <p className="text-muted text-base">Личный ментор 24/7. Поможет решить задачу, объяснит сложную тему или подберет университет.</p>
+            </div>
+          </div>
+          
+          {/* Card 3: Guides */}
+          <div className="bento-card p-8 flex flex-col justify-end min-h-[320px] relative group">
+            <div className="absolute inset-0 opacity-10 group-hover:opacity-30 transition-opacity duration-500" style={{ background: 'radial-gradient(circle at top left, var(--glow-secondary), transparent 60%)' }}></div>
+            <div className="relative z-10">
+              <div className="w-12 h-12 rounded-2xl glass-floating flex items-center justify-center text-2xl mb-6 shadow-lg">🎓</div>
+              <h3 className="text-2xl font-bold mb-3 text-white tracking-tight">Гайды и стипендии</h3>
+              <p className="text-muted text-base">Инструкции по поступлению, грантам и получению стипендий.</p>
+            </div>
+          </div>
+          
+          {/* Card 4: Free (spans 2 cols) */}
+          <div className="bento-card md:col-span-2 p-8 flex flex-col justify-center items-center text-center min-h-[320px] relative overflow-hidden">
+            <div className="absolute inset-0 opacity-30" style={{ background: 'linear-gradient(45deg, rgba(0,0,0,0), rgba(255,255,255,0.03), rgba(0,0,0,0))' }}></div>
+            <div className="relative z-10">
+              <h3 className="text-6xl font-extrabold mb-4 text-gradient">0 Тенге.</h3>
+              <p className="text-xl text-muted font-medium max-w-sm mx-auto">Качественное образование должно быть свободным. Навсегда.</p>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      <section className="max-w-5xl mx-auto px-5 mb-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Предметы</h2>
-          <a href="/search" className="text-sm font-medium" style={{ color: 'var(--teal)' }}>Все →</a>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-          {categories.map(cat => (
-            <a key={cat.label} href={`/search?q=${cat.label}`}
-              style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }}
-              className="rounded-2xl p-4 text-center hover:border-[var(--teal)] hover:shadow-md group transition-all">
-              <span className="text-2xl block mb-2">{cat.icon}</span>
-              <p className="text-xs font-semibold" style={{ color: 'var(--text)' }}>{cat.label}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--gray-dark)' }}>{cat.count} книг</p>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="max-w-5xl mx-auto px-5 mb-16">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Популярные учебники</h2>
-          <a href="/search" className="text-sm font-medium" style={{ color: 'var(--teal)' }}>Смотреть все →</a>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {[
-            { subject: 'Математика', grade: 10, title: 'Алгебра и начала анализа', emoji: '📐' },
-            { subject: 'Физика',     grade: 11, title: 'Физика для 11 класса',     emoji: '⚗️' },
-            { subject: 'Информатика',grade: 9,  title: 'Основы программирования',  emoji: '💻' },
-          ].map(book => (
-            <a key={book.title} href="/search"
-              style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }}
-              className="rounded-2xl overflow-hidden hover:shadow-md hover:border-[var(--teal)] transition-all group">
-              <div className="h-36 flex items-center justify-center text-5xl"
-                style={{ background: 'var(--teal-pale)' }}>
-                {book.emoji}
-              </div>
-              <div className="p-4">
-                <span className="text-xs font-semibold" style={{ color: 'var(--teal)' }}>
-                  {book.subject} · {book.grade} класс
-                </span>
-                <h3 className="text-sm font-semibold mt-1 group-hover:text-[var(--teal)] transition-colors"
-                  style={{ color: 'var(--text)' }}>
-                  {book.title}
-                </h3>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-xs px-2 py-1 rounded-full font-medium"
-                    style={{ background: 'var(--teal-light)', color: 'var(--teal-dark)' }}>
-                    Бесплатно
-                  </span>
-                  <span className="text-xs" style={{ color: 'var(--gray-dark)' }}>📖 Читать</span>
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="max-w-5xl mx-auto px-5 mb-16">
-        <div className="rounded-3xl p-10 text-center"
-          style={{ background: 'linear-gradient(135deg, var(--coral-light) 0%, var(--teal-pale) 100%)', border: '1.5px solid var(--gray)' }}>
-          <p className="text-sm font-semibold mb-3" style={{ color: 'var(--coral)' }}>🌱 ЦУР 4 — Качественное образование</p>
-          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
-            Помогите расширить доступ к знаниям
-          </h2>
-          <p className="text-sm mb-6 max-w-md mx-auto" style={{ color: 'var(--text-muted)' }}>
-            Вы учитель или студент? Загрузите свои материалы и помогите тысячам казахстанцев.
-          </p>
-          <a href="/about"
-            style={{ background: 'var(--coral)', color: 'white' }}
-            className="inline-block px-7 py-3 rounded-2xl font-semibold text-sm hover:opacity-90 shadow-md">
-            Поделиться материалами
-          </a>
-        </div>
-      </section>
+      {/* Footer */}
+      <footer className="relative z-10 py-12 px-6 border-t border-[rgba(255,255,255,0.05)] text-center text-sm text-muted">
+        <p>© 2026 OpenLearn. Создано с любовью для образования будущего.</p>
+      </footer>
     </div>
   );
 }

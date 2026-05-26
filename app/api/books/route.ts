@@ -26,6 +26,8 @@ export async function POST(request: NextRequest) {
     if (existingBook) {
       return NextResponse.json(existingBook)
     }
+
+    const book = await prisma.book.create({
       data: {
         title,
         author,

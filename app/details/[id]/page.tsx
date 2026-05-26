@@ -27,6 +27,7 @@ function parseBookId(id: string) {
 
 function Stars({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
   const [hover, setHover] = useState(0);
+  const ro = !onChange;
   return (
     <div style={{ display: 'flex', gap: '2px' }}>
       {[1,2,3,4,5].map(s => (

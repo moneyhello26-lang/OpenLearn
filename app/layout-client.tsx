@@ -12,16 +12,12 @@ export default function LayoutClient({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+    <div className="min-h-screen flex flex-col relative">
+      <Header />
 
-      <div className="flex flex-1 pt-16">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-        <main className="flex-1 w-full">
-          {children}
-        </main>
-      </div>
+      <main className="flex-1 w-full pt-16">
+        {children}
+      </main>
     </div>
   );
 }

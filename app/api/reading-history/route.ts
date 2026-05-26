@@ -25,15 +25,6 @@ export async function POST(request: NextRequest) {
 
     const progress = totalPages ? (currentPage / totalPages) * 100 : 0
 
-    if (!book) {
-      return NextResponse.json(
-        { error: 'Book not found' },
-        { status: 404 }
-      )
-    }
-
-    const progress = totalPages ? (currentPage / totalPages) * 100 : 0
-
     const history = await prisma.readingHistory.upsert({
       where: {
         userId_bookId: {

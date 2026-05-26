@@ -14,6 +14,7 @@ function okulykUrl(grade: number, subjectKey: string) {
 }
 
 const KZ_TEXTBOOKS = [
+  {
     id: 'kz-math-5-ru', title: 'Математика. 5 класс',
     authors: ['Акпаева А.Б.', 'Ибраева А.Т.'],
     description: 'Учебник математики для 5 класса общеобразовательных школ Казахстана. Натуральные числа, дроби, проценты, геометрические фигуры.',

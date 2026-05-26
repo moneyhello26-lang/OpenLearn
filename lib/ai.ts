@@ -1,14 +1,19 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.GEMINI_API;
+const apiKey = process.env.GEMINI_API || "";
 
-if (!apiKey) {
-  throw new Error("GEMINI_API environment variable is not set");
+let _genAI: GoogleGenerativeAI | null = null;
+function getGenAI(): GoogleGenerativeAI {
+  if (!_genAI) {
+    if (!apiKey) {
+      throw new Error("GEMINI_API environment variable is not set. Add it to .env.local");
+    }
+    _genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return _genAI;
 }
 
-const genAI = new GoogleGenerativeAI(apiKey);
-
-export type AIModel = "gemini-pro" | "gemini-1.5-pro" | "gemini-1.5-flash";
+export type AIModel = "gemma-4-26b-a4b-it" | "gemini-pro-latest" | "gemini-flash-latest";
 
 interface AIGenerateOptions {
   temperature?: number;
@@ -26,11 +31,20 @@ interface AIGenerateOptions {
  */
 export async function generateAIResponse(
   prompt: string,
-  model: AIModel = "gemini-1.5-flash",
+  model: AIModel = "gemma-4-26b-a4b-it",
   options: AIGenerateOptions = {}
 ): Promise<string> {
+  if (!apiKey) {
+    // Graceful fallback when no API key is provided
+    console.warn("GEMINI_API is not set. Returning mock AI response.");
+    await new Promise(r => setTimeout(r, 1500)); // Simulate network latency
+    if (prompt.includes("category")) return JSON.stringify({ isSafe: true, category: "Educational", confidence: 0.98 });
+    if (prompt.includes("JSON")) return JSON.stringify({ data: "Mock JSON response" });
+    return "💡 Это демонстрационный ответ, так как API-ключ Gemini не настроен. Пожалуйста, добавьте `GEMINI_API=ваш_ключ` в файл `.env.local`, чтобы включить настоящую генерацию.";
+  }
+
   try {
-    const generativeModel = genAI.getGenerativeModel({ model });
+    const generativeModel = getGenAI().getGenerativeModel({ model });
 
     const generationConfig = {
       temperature: options.temperature ?? 0.7,
@@ -44,13 +58,12 @@ export async function generateAIResponse(
       generationConfig,
     });
 
-    const response = result.response;
-    const text = response.text();
-
-    return text;
+    return result.response.text();
   } catch (error) {
     console.error("Error generating AI response:", error);
-    throw new Error(`Failed to generate AI response: ${error}`);
+    if (prompt.includes("category")) return JSON.stringify({ isSafe: true, category: "Error", confidence: 0 });
+    const msg = error instanceof Error ? error.message : String(error);
+    return `💡 Ошибка API: ${msg}`;
   }
 }
 
@@ -62,11 +75,17 @@ export async function generateAIResponse(
  */
 export async function generateChatResponse(
   messages: Array<{ role: "user" | "assistant"; content: string }>,
-  model: AIModel = "gemini-1.5-flash",
+  model: AIModel = "gemma-4-26b-a4b-it",
   options: AIGenerateOptions = {}
 ): Promise<string> {
+  if (!apiKey) {
+    console.warn("GEMINI_API is not set. Returning mock Chat response.");
+    await new Promise(r => setTimeout(r, 1200));
+    return "🤖 *Демо-режим*: Ваш API ключ не настроен. Я искусственный интеллект-заглушка. Чтобы общаться со мной по-настоящему, добавьте `GEMINI_API` в `.env.local`.";
+  }
+
   try {
-    const generativeModel = genAI.getGenerativeModel({ model });
+    const generativeModel = getGenAI().getGenerativeModel({ model });
 
     const generationConfig = {
       temperature: options.temperature ?? 0.7,
@@ -76,7 +95,7 @@ export async function generateChatResponse(
     };
 
     const contents = messages.map((msg) => ({
-      role: msg.role,
+      role: msg.role === "assistant" ? "model" : msg.role,
       parts: [{ text: msg.content }],
     }));
 
@@ -88,7 +107,8 @@ export async function generateChatResponse(
     return result.response.text();
   } catch (error) {
     console.error("Error generating chat response:", error);
-    throw new Error(`Failed to generate chat response: ${error}`);
+    const msg = error instanceof Error ? error.message : String(error);
+    return `🤖 *Ошибка API*: ${msg}`;
   }
 }
 
@@ -119,7 +139,7 @@ Please provide:
 
 Format the response in a clear, readable way.`;
 
-  return generateAIResponse(prompt, "gemini-1.5-pro", { temperature: 0.5 });
+  return generateAIResponse(prompt, "gemma-4-26b-a4b-it", { temperature: 0.5 });
 }
 
 /**
@@ -136,7 +156,7 @@ Subject: ${subject}
 
 The description should be engaging, highlight key learning points, and be suitable for an educational platform.`;
 
-  return generateAIResponse(prompt, "gemini-1.5-flash", { temperature: 0.8 });
+  return generateAIResponse(prompt, "gemma-4-26b-a4b-it", { temperature: 0.8 });
 }
 
 /**
@@ -150,46 +170,48 @@ export async function answerQuestion(
     ? `Using the following context:\n${context}\n\nAnswer this question: ${question}`
     : `Answer this question: ${question}`;
 
-  return generateAIResponse(prompt, "gemini-1.5-pro", { temperature: 0.5 });
+  return generateAIResponse(prompt, "gemma-4-26b-a4b-it", { temperature: 0.5 });
 }
 
 /**
  * Analyze and moderate content
  */
 export async function analyzeContent(content: string): Promise<{
-  isSafe: boolean;
-  category: string;
-  confidence: number;
-  suggestions?: string;
+  ieltsBand?: string;
+  toeflScore?: string;
+  feedback?: string;
+  error?: string;
 }> {
-  const prompt = `Analyze the following content for safety and appropriateness. Respond in JSON format with: isSafe (boolean), category (educational/inappropriate/spam/other), confidence (0-1), and suggestions if needed.
+  const prompt = `You are an expert IELTS and TOEFL examiner. Evaluate the following essay/text. 
+Calculate an approximate IELTS Band Score (0-9) and a TOEFL iBT Writing Score (0-30).
+Provide brief feedback on vocabulary, grammar, and coherence.
 
 Content: "${content}"
 
-Respond only with valid JSON.`;
+Respond ONLY with valid JSON in this exact format:
+{
+  "ieltsBand": "7.0",
+  "toeflScore": "24",
+  "feedback": "Your detailed feedback here..."
+}`;
 
   try {
-    const response = await generateAIResponse(prompt, "gemini-1.5-flash", {
+    const response = await generateAIResponse(prompt, "gemma-4-26b-a4b-it", {
       temperature: 0.3,
     });
 
-    // Extract JSON from response
+    if (response.includes("Ошибка API:")) {
+      return { error: response };
+    }
+
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
 
-    return {
-      isSafe: true,
-      category: "unknown",
-      confidence: 0.5,
-    };
+    return { error: "Failed to parse AI response into JSON." };
   } catch (error) {
     console.error("Error analyzing content:", error);
-    return {
-      isSafe: true,
-      category: "error",
-      confidence: 0,
-    };
+    return { error: "An unexpected error occurred during analysis." };
   }
 }

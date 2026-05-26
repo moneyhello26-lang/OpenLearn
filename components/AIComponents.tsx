@@ -4,66 +4,48 @@ import { useState } from "react";
 import { useUniversityFinder, useAskAI, useGenerateDescription } from "@/lib/useAI";
 import ReactMarkdown from "react-markdown";
 
-/**
- * Безопасная функция для конвертации unknown-данных в валидный ReactNode.
- * Полностью соответствует правилам ESLint (без explicit any).
- */
 function renderData(data: unknown): React.ReactNode {
   if (!data) return null;
 
   if (typeof data === "string") {
-    return <ReactMarkdown >{data}</ReactMarkdown>;
+    return <ReactMarkdown>{data}</ReactMarkdown>;
   }
 
   if (typeof data === "object") {
     const obj = data as Record<string, unknown>;
 
-    // Если бэкенд возвращает { response: "..." } (как в вашем /api/ai/simple)
     if ("response" in obj && typeof obj.response === "string") {
-      return <ReactMarkdown ></ReactMarkdown>;
+      return <ReactMarkdown>{obj.response}</ReactMarkdown>;
     }
-
-    // Проверка наличия поля 'answer'
     if ("answer" in obj && obj.answer !== undefined && obj.answer !== null) {
       return <ReactMarkdown>{String(obj.answer)}</ReactMarkdown>;
     }
-
-    // Проверка наличия поля 'description'
     if ("description" in obj && obj.description !== undefined && obj.description !== null) {
-      return <ReactMarkdown >{String(obj.description)}</ReactMarkdown>;
+      return <ReactMarkdown>{String(obj.description)}</ReactMarkdown>;
     }
   }
 
-  // Фаллбэк для массивов или кастомных JSON структур
   return (
-    <pre className="text-xs bg-gray-50 p-2 rounded overflow-auto font-mono text-gray-800">
+    <pre className="text-xs p-3 rounded-xl overflow-auto" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
       {JSON.stringify(data, null, 2)}
     </pre>
   );
 }
 
 /**
- * Component: University Finder Form
- * Позволяет студентам найти подходящие университеты
+ * University Finder
  */
 export function UniversityFinderForm() {
   const { execute, loading, error, data } = useUniversityFinder();
   const [formData, setFormData] = useState({
-    gpa: 3.8,
-    sat: 1480,
-    ielts: 7.5,
+    gpa: 3.8, sat: 1480, ielts: 7.5,
     specialization: "Computer Science",
     countryPreference: "Canada",
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: isNaN(Number(value)) ? value : Number(value),
-    }));
+    setFormData(prev => ({ ...prev, [name]: isNaN(Number(value)) ? value : Number(value) }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,91 +55,64 @@ export function UniversityFinderForm() {
 
   const hasData = data !== undefined && data !== null;
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '11px 14px',
+    border: '1.5px solid var(--gray-mid)', borderRadius: '12px',
+    fontSize: '14px', fontFamily: 'Sora, sans-serif',
+    color: 'var(--text)', background: 'var(--bg)', outline: 'none',
+  };
+
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Find Your University</h2>
+    <div className="w-full max-w-2xl mx-auto">
+      <h2 className="text-xl font-bold mb-6 flex items-center gap-2"
+        style={{ color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
+        🎓 Поиск университетов
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">GPA</label>
-          <input
-            type="number"
-            name="gpa"
-            value={formData.gpa}
-            onChange={handleChange}
-            step="0.1"
-            min="0"
-            max="4"
-            className="w-full p-2 border rounded-md text-gray-800"
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>GPA</label>
+            <input type="number" name="gpa" value={formData.gpa} onChange={handleChange} step="0.1" min="0" max="4" style={inputStyle} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>SAT</label>
+            <input type="number" name="sat" value={formData.sat} onChange={handleChange} style={inputStyle} />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>IELTS</label>
+            <input type="number" name="ielts" value={formData.ielts} onChange={handleChange} step="0.1" style={inputStyle} />
+          </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">SAT Score</label>
-          <input
-            type="number"
-            name="sat"
-            value={formData.sat}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md text-gray-800"
-          />
+          <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Специализация</label>
+          <input type="text" name="specialization" value={formData.specialization} onChange={handleChange} style={inputStyle} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">IELTS Score</label>
-          <input
-            type="number"
-            name="ielts"
-            value={formData.ielts}
-            onChange={handleChange}
-            step="0.1"
-            className="w-full p-2 border rounded-md text-gray-800"
-          />
+          <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Страна</label>
+          <input type="text" name="countryPreference" value={formData.countryPreference} onChange={handleChange} style={inputStyle} />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Specialization</label>
-          <input
-            type="text"
-            name="specialization"
-            value={formData.specialization}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md text-gray-800"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Country Preference
-          </label>
-          <input
-            type="text"
-            name="countryPreference"
-            value={formData.countryPreference}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md text-gray-800"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-400 font-semibold transition-colors"
-        >
-          {loading ? "Searching..." : "Find Universities"}
+        <button type="submit" disabled={loading}
+          className="btn-primary w-full py-3.5 text-sm disabled:opacity-50"
+          style={{ fontFamily: 'Sora, sans-serif' }}>
+          {loading ? "⏳ Ищем..." : "🔍 Найти университеты"}
         </button>
       </form>
 
       {error && (
-        <div className="mt-4 p-4 bg-red-100 text-red-800 rounded-md">
+        <div className="mt-4 p-4 rounded-2xl" style={{ background: 'var(--coral-light)', color: 'var(--coral-dark)' }}>
           {String(error)}
         </div>
       )}
 
       {hasData && (
-        <div className="mt-6 p-4 bg-gray-100 rounded-md max-h-96 overflow-y-auto">
-          <h3 className="font-bold mb-3 text-gray-800">Recommendations:</h3>
-          <div className="text-sm">{renderData(data)}</div>
+        <div className="mt-6 p-5 rounded-2xl max-h-96 overflow-y-auto"
+          style={{ background: 'var(--teal-pale)', border: '1.5px solid var(--teal-light)' }}>
+          <h3 className="font-bold text-sm mb-3" style={{ color: 'var(--teal-dark)' }}>Рекомендации:</h3>
+          <div className="text-sm leading-relaxed prose-sm" style={{ color: 'var(--text)' }}>{renderData(data)}</div>
         </div>
       )}
     </div>
@@ -165,8 +120,7 @@ export function UniversityFinderForm() {
 }
 
 /**
- * Component: AI Question Answerer
- * Позволяет пользователям задавать вопросы ИИ
+ * Ask AI
  */
 export function AskAIComponent() {
   const { execute, loading, error, data } = useAskAI();
@@ -176,68 +130,58 @@ export function AskAIComponent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim()) return;
-
-    await execute({
-      question,
-      context: context || undefined,
-    });
+    await execute({ question, context: context || undefined });
   };
 
   const hasData = data !== undefined && data !== null;
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '12px 14px',
+    border: '1.5px solid var(--gray-mid)', borderRadius: '12px',
+    fontSize: '14px', fontFamily: 'Sora, sans-serif',
+    color: 'var(--text)', background: 'var(--bg)', outline: 'none',
+  };
+
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Ask AI a Question</h2>
+    <div className="w-full max-w-2xl mx-auto">
+      <h2 className="text-xl font-bold mb-6 flex items-center gap-2"
+        style={{ color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
+        ❓ Задать вопрос AI
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">Question</label>
-          <input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask anything..."
-            className="w-full p-3 border rounded-md text-gray-800"
-            maxLength={5000}
-          />
-          <div className="text-xs text-gray-500 mt-1">
-            {question.length} / 5000
-          </div>
+          <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Вопрос</label>
+          <input type="text" value={question} onChange={(e) => setQuestion(e.target.value)}
+            placeholder="Задайте любой вопрос..." maxLength={5000} style={inputStyle} />
+          <div className="text-xs mt-1" style={{ color: 'var(--gray-dark)' }}>{question.length} / 5000</div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">
-            Context (Optional)
-          </label>
-          <textarea
-            value={context}
-            onChange={(e) => setContext(e.target.value)}
-            placeholder="Add context or documents..."
-            className="w-full p-3 border rounded-md h-32 resize-none text-gray-800"
-          />
+          <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Контекст (необязательно)</label>
+          <textarea value={context} onChange={(e) => setContext(e.target.value)}
+            placeholder="Добавьте контекст или документы..."
+            className="resize-none h-28" style={{ ...inputStyle, resize: 'none' as const, height: '100px' }} />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading || !question.trim()}
-          className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 disabled:bg-gray-400 font-semibold transition-colors"
-        >
-          {loading ? "Getting Answer..." : "Ask AI"}
+        <button type="submit" disabled={loading || !question.trim()}
+          className="btn-primary w-full py-3.5 text-sm disabled:opacity-50"
+          style={{ fontFamily: 'Sora, sans-serif' }}>
+          {loading ? "⏳ Получаем ответ..." : "🚀 Спросить AI"}
         </button>
       </form>
 
       {error && (
-        <div className="mt-4 p-4 bg-red-100 text-red-800 rounded-md">
+        <div className="mt-4 p-4 rounded-2xl" style={{ background: 'var(--coral-light)', color: 'var(--coral-dark)' }}>
           {String(error)}
         </div>
       )}
 
       {hasData && (
-        <div className="mt-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-md">
-          <h3 className="font-bold text-green-900 mb-2">Answer:</h3>
-          <div className="leading-relaxed">
-            {renderData(data)}
-          </div>
+        <div className="mt-6 p-5 rounded-2xl"
+          style={{ background: 'var(--teal-pale)', border: '1.5px solid var(--teal-light)' }}>
+          <h3 className="font-bold text-sm mb-3" style={{ color: 'var(--teal-dark)' }}>✅ Ответ:</h3>
+          <div className="text-sm leading-relaxed prose-sm" style={{ color: 'var(--text)' }}>{renderData(data)}</div>
         </div>
       )}
     </div>
@@ -245,100 +189,79 @@ export function AskAIComponent() {
 }
 
 /**
- * Component: Generate Description
- * Генерирует описание для книг и курсов
+ * Generate Description
  */
 export function GenerateDescriptionComponent() {
   const { execute, loading, error, data } = useGenerateDescription();
-  const [formData, setFormData] = useState({
-    title: "",
-    subject: "",
-    context: "book",
-  });
+  const [formData, setFormData] = useState({ title: "", subject: "", context: "book" });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.subject) return;
-
     await execute(formData);
   };
 
   const hasData = data !== undefined && data !== null;
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%', padding: '11px 14px',
+    border: '1.5px solid var(--gray-mid)', borderRadius: '12px',
+    fontSize: '14px', fontFamily: 'Sora, sans-serif',
+    color: 'var(--text)', background: 'var(--bg)', outline: 'none',
+  };
+
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Generate Description</h2>
+    <div className="w-full max-w-2xl mx-auto">
+      <h2 className="text-xl font-bold mb-6 flex items-center gap-2"
+        style={{ color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
+        📝 Генератор описаний
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">Title</label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            placeholder="Book or course title"
-            className="w-full p-3 border rounded-md text-gray-800"
-          />
+          <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Название</label>
+          <input type="text" name="title" value={formData.title} onChange={handleChange}
+            placeholder="Название книги или курса" style={inputStyle} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">Subject</label>
-          <input
-            type="text"
-            name="subject"
-            value={formData.subject}
-            onChange={handleChange}
-            placeholder="Subject area"
-            className="w-full p-3 border rounded-md text-gray-800"
-          />
+          <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Предмет</label>
+          <input type="text" name="subject" value={formData.subject} onChange={handleChange}
+            placeholder="Область знания" style={inputStyle} />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">Type</label>
-          <select
-            name="context"
-            value={formData.context}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-md text-gray-800 bg-white"
-          >
-            <option value="book">Book</option>
-            <option value="course">Course</option>
-            <option value="article">Article</option>
+          <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Тип</label>
+          <select name="context" value={formData.context} onChange={handleChange} style={inputStyle}>
+            <option value="book">Книга</option>
+            <option value="course">Курс</option>
+            <option value="article">Статья</option>
           </select>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading || !formData.title || !formData.subject}
-          className="w-full bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 disabled:bg-gray-400 font-semibold transition-colors"
-        >
-          {loading ? "Generating..." : "Generate Description"}
+        <button type="submit" disabled={loading || !formData.title || !formData.subject}
+          className="btn-coral w-full py-3.5 text-sm disabled:opacity-50"
+          style={{ fontFamily: 'Sora, sans-serif' }}>
+          {loading ? "⏳ Генерируем..." : "✨ Сгенерировать описание"}
         </button>
       </form>
 
       {error && (
-        <div className="mt-4 p-4 bg-red-100 text-red-800 rounded-md">
+        <div className="mt-4 p-4 rounded-2xl" style={{ background: 'var(--coral-light)', color: 'var(--coral-dark)' }}>
           {String(error)}
         </div>
       )}
 
       {hasData && (
-        <div className="mt-6 p-4 bg-purple-50 rounded-md">
-          <h3 className="font-bold text-purple-900 mb-3">Generated Description:</h3>
-          <div className="leading-relaxed">
-            {renderData(data)}
-          </div>
+        <div className="mt-6 p-5 rounded-2xl"
+          style={{ background: 'var(--coral-light)', border: '1.5px solid var(--coral)' }}>
+          <h3 className="font-bold text-sm mb-3" style={{ color: 'var(--coral-dark)' }}>✨ Описание:</h3>
+          <div className="text-sm leading-relaxed prose-sm" style={{ color: 'var(--text)' }}>{renderData(data)}</div>
         </div>
       )}
     </div>

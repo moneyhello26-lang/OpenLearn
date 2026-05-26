@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface SimpleRequest {
   prompt: string;
-  model?: "gemini-pro" | "gemini-1.5-pro" | "gemini-1.5-flash";
+  model?: "gemma-4-26b-a4b-it" | "gemini-pro-latest" | "gemini-flash-latest";
   temperature?: number;
   maxTokens?: number;
 }
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: SimpleRequest = await request.json();
 
-    const { prompt, model = "gemini-1.5-flash", temperature = 0.7, maxTokens = 2048 } = body;
+    const { prompt, model = "gemma-4-26b-a4b-it", temperature = 0.7, maxTokens = 2048 } = body;
 
     if (!prompt) {
       return NextResponse.json(

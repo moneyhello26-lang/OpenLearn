@@ -1,80 +1,68 @@
+import Link from 'next/link';
+
 export default function AboutPage() {
   return (
-    <div className="w-full max-w-5xl mx-auto px-5">
-      <div className="space-y-6">
-        <section className="text-center space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--text)' }}>
-            О платформе <span style={{ color: 'var(--teal)' }}>OpenLearn</span>
-          </h1>
-          <p className="text-xl max-w-2xl mx-auto" style={{ color: 'var(--text-muted)' }}>
-            Открытая платформа для онлайн обучения, где каждый может найти курсы и поделиться своими знаниями
-          </p>
-        </section>
-
-
-        <section className="space-y-4">
-          <h2 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Наши возможности</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { title: 'Широкий выбор', description: 'Тысячи курсов на различные темы' },
-              { title: 'Качество контента', description: 'Курсы от опытных преподавателей' },
-              { title: 'Рейтинги и отзывы', description: 'Система оценивания курсов студентами' },
-              { title: 'Гибкое обучение', description: 'Учитесь в своем собственном темпе' },
-              { title: 'Сертификаты', description: 'Получайте сертификаты после прохождения' },
-              { title: 'Поддержка', description: 'Помощь от сообщества и модераторов' },
-            ].map((feature, i) => (
-              <div key={i} className="rounded-lg p-6" style={{ background: 'var(--surface)' }}>
-                <div className="text-3xl mb-3">
-                  {i === 0 && '📚'}
-                  {i === 1 && '⭐'}
-                  {i === 2 && '👥'}
-                  {i === 3 && '⏰'}
-                  {i === 4 && '🎓'}
-                  {i === 5 && '🤝'}
-                </div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text)' }}>{feature.title}</h3>
-                <p style={{ color: 'var(--text-muted)' }}>{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-lg p-12" style={{ background: 'var(--teal-pale)' }}>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold mb-2" style={{ color: 'var(--teal)' }}>10,000+</div>
-              <div style={{ color: 'var(--text-muted)' }}>Курсов</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2" style={{ color: 'var(--teal)' }}>500,000+</div>
-              <div style={{ color: 'var(--text-muted)' }}>Студентов</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2" style={{ color: 'var(--teal)' }}>1,000+</div>
-              <div style={{ color: 'var(--text-muted)' }}>Инструкторов</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2" style={{ color: 'var(--teal)' }}>4.7★</div>
-              <div style={{ color: 'var(--text-muted)' }}>Средний рейтинг</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="text-center space-y-4">
-          <h2 className="text-2xl font-bold" style={{ color: 'var(--text)' }}>Остались вопросы?</h2>
-          <p className="max-w-2xl mx-auto" style={{ color: 'var(--text-muted)' }}>
-            Свяжитесь с нами, и мы поможем вам!
-          </p>
-          <div className="flex gap-4 justify-center">
-            <a  href="mailto:info@openlearn.kz" className="px-6 py-3 text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity" style={{ background: 'var(--blue)' }}>
-              Email
-            </a>
-            <a href="#" className="px-6 py-3 rounded-lg transition-colors" style={{ background: 'var(--gray)', color: 'var(--text)' }}>
-              Связаться
-            </a>
-          </div>
-        </section>
+    <div className="min-h-screen pt-24 pb-20 px-6 max-w-5xl mx-auto">
+      
+      <div className="mb-16 slide-up text-center">
+        <Link href="/" className="text-sm text-muted hover:text-foreground font-medium mb-6 inline-block">&larr; На главную</Link>
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6" style={{ letterSpacing: '-0.04em' }}>
+          О проекте
+        </h1>
+        <p className="text-lg text-muted max-w-2xl mx-auto">
+          OpenLearn создан для того, чтобы сделать качественное образование доступным каждому школьнику и абитуриенту в Казахстане. Без рекламы. Без скрытых платежей.
+        </p>
       </div>
+
+      <div className="grid md:grid-cols-2 gap-12 mb-20 slide-up delay-1">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight mb-4">Наша миссия</h2>
+          <p className="text-muted mb-4">
+            Мы верим, что знания не должны быть привилегией. В эпоху цифровизации доступ к качественным учебным материалам должен быть базовым правом каждого ученика, независимо от его места проживания или финансового положения.
+          </p>
+          <p className="text-muted">
+            Платформа объединяет учебники, методические пособия, информацию о грантах и стипендиях, создавая единую экосистему для развития и обучения.
+          </p>
+        </div>
+        
+        <div className="card p-8 bg-[var(--accents-1)]">
+          <h3 className="text-xl font-semibold mb-6 tracking-tight">Ключевые принципы</h3>
+          <ul className="space-y-4">
+            <li className="flex gap-3">
+              <span className="text-foreground">01</span>
+              <div>
+                <p className="font-medium text-sm">Полная открытость</p>
+                <p className="text-sm text-muted mt-1">Все базовые материалы доступны без регистрации и оплаты.</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-foreground">02</span>
+              <div>
+                <p className="font-medium text-sm">ИИ-интеграция</p>
+                <p className="text-sm text-muted mt-1">Использование нейросетей для персонализации обучения.</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-foreground">03</span>
+              <div>
+                <p className="font-medium text-sm">Скорость и минимализм</p>
+                <p className="text-sm text-muted mt-1">Ничего лишнего. Только контент и удобная навигация.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="card p-12 text-center slide-up delay-2">
+        <h2 className="text-2xl font-semibold tracking-tight mb-4">Присоединяйтесь к нам</h2>
+        <p className="text-muted max-w-xl mx-auto mb-8">
+          Если вы хотите помочь развитию проекта, добавить свои материалы или стать партнером платформы — свяжитесь с нами.
+        </p>
+        <a href="mailto:contact@openlearn.kz" className="btn btn-primary text-base px-8 py-3">
+          Написать нам
+        </a>
+      </div>
+
     </div>
   );
 }

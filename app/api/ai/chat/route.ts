@@ -7,7 +7,7 @@ interface ChatRequest {
     role: "user" | "assistant";
     content: string;
   }>;
-  model?: "gemini-pro" | "gemini-1.5-pro" | "gemini-1.5-flash";
+  model?: "gemma-4-26b-a4b-it" | "gemini-pro-latest" | "gemini-flash-latest";
   temperature?: number;
   maxTokens?: number;
 }
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     const {
       messages,
-      model = "gemini-1.5-pro",
+      model = "gemma-4-26b-a4b-it",
       temperature = 0.7,
       maxTokens = 2048,
     } = body;

@@ -103,7 +103,7 @@ export async function generateIdeas(
 
   try {
     const result = await generateJSON(prompt);
-    return Array.isArray(result) ? result : Object.values(result).flat();
+    return Array.isArray(result) ? result as string[] : (Object.values(result).flat() as string[]);
   } catch (error) {
     console.error("Failed to generate ideas:", error);
     return [];
@@ -150,7 +150,7 @@ ${text}
 
   try {
     const result = await generateJSON(prompt);
-    return Array.isArray(result) ? result : Object.values(result).flat();
+    return Array.isArray(result) ? result as string[] : (Object.values(result).flat() as string[]);
   } catch (error) {
     console.error("Failed to generate questions:", error);
     return [];

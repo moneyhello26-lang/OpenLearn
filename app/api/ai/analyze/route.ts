@@ -19,21 +19,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (content.length < 5) {
-      return NextResponse.json(
-        { error: "Content must be at least 5 characters" },
-        { status: 400 }
-      );
-    }
-
-    if (content.length > 5000) {
-      return NextResponse.json(
-        { error: "Content must be less than 5000 characters" },
-        { status: 400 }
-      );
-    }
-
     const analysis = await analyzeContent(content);
+
+    if (analysis.error) {
+      return NextResponse.json(
+        { error: analysis.error },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
