@@ -19,9 +19,12 @@ function ReaderContent() {
     );
   }
 
+  const isGoogle = src.startsWith('google:');
   const isArchive = src.includes('archive.org');
   const isPdf = src.toLowerCase().includes('.pdf') || src.includes('emektep.kz/qr');
-  const isHtml = src.startsWith('http') && !isPdf && !isArchive;
+  const isHtml = src.startsWith('http') && !isPdf && !isArchive && !isGoogle;
+
+  const googleVolumeId = isGoogle ? src.replace('google:', '') : '';
 
   return (
     <div className="flex flex-col h-screen">
@@ -36,7 +39,7 @@ function ReaderContent() {
           {decodeURIComponent(title)}
         </h1>
         <a
-          href={src}
+          href={isGoogle ? `https://play.google.com/store/books/details?id=${googleVolumeId}` : src}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-zinc-500 hover:text-blue-500 whitespace-nowrap"
@@ -45,23 +48,30 @@ function ReaderContent() {
         </a>
       </div>
 
-      <div className="flex-1 bg-zinc-100 dark:bg-zinc-950">
-        {(isPdf || isArchive) ? (
+      <div className="flex-1 bg-zinc-100 dark:bg-zinc-950 relative overflow-hidden">
+        {isGoogle ? (
+          <iframe
+            src={`/api/viewer?id=${googleVolumeId}`}
+            className="w-full h-full border-0 absolute inset-0 z-10"
+            title={decodeURIComponent(title)}
+            allow="fullscreen"
+          />
+        ) : (isPdf || isArchive) ? (
           <iframe
             src={src}
-            className="w-full h-full border-0"
+            className="w-full h-full border-0 absolute inset-0"
             title={decodeURIComponent(title)}
             allow="fullscreen"
           />
         ) : isHtml ? (
           <iframe
             src={src}
-            className="w-full h-full border-0"
+            className="w-full h-full border-0 absolute inset-0"
             title={decodeURIComponent(title)}
             sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full gap-4 text-zinc-600 dark:text-zinc-400">
+          <div className="flex flex-col items-center justify-center h-full gap-4 text-zinc-600 dark:text-zinc-400 absolute inset-0">
             <p>Не удалось отобразить содержимое.</p>
             <a
               href={src}

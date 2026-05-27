@@ -23,27 +23,35 @@ async function fetchKazakhstan(query: string, baseUrl: string) {
 
 async function fetchGoogle(query: string) {
   try {
-    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&filter=free-ebooks&maxResults=10&printType=books`);
+    // Add API key if available in env to prevent rate limits
+    const apiKey = process.env.GOOGLE_API_KEY ? `&key=${process.env.GOOGLE_API_KEY}` : '';
+    // Fetch all materials, up to 20 results
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20${apiKey}`);
     const data = await res.json();
+    
     return (data.items || []).map((item: any) => {
       const info = item.volumeInfo;
       const access = item.accessInfo;
       const hasFullText = access?.viewability === 'ALL_PAGES' || access?.epub?.isAvailable || access?.pdf?.isAvailable;
       const readUrl = info.canonicalVolumeLink || info.previewLink;
+      
       return {
         id: `google-${item.id}`,
         title: info.title || '',
         authors: info.authors || [],
         description: info.description || info.subtitle || '',
         image: (info.imageLinks?.thumbnail || '').replace('http:', 'https:'),
-        price: 'Бесплатно',
+        price: item.saleInfo?.saleability === 'FOR_SALE' && item.saleInfo.retailPrice 
+          ? `${item.saleInfo.retailPrice.amount} ${item.saleInfo.retailPrice.currencyCode}`
+          : (item.saleInfo?.saleability === 'FREE' ? 'Бесплатно' : 'Нет цены'),
         url: readUrl,
         pageUrl: info.infoLink,
         source: 'Google Books',
         type: 'book',
-        category: 'Книги',
+        category: 'Google Library',
         hasFullText,
-        readerUrl: hasFullText ? readUrl : null,
+        // Pass special prefix 'google:' followed by volume ID to our reader
+        readerUrl: hasFullText ? `google:${item.id}` : null,
       };
     });
   } catch { return []; }
@@ -98,24 +106,28 @@ export async function GET(request: NextRequest) {
     const isKz = isKzQuery(query);
 
     if (type !== 'course') {
-      // 1. Казахстанские учебники (приоритет для физики/математики/информатики)
+      // 1. Kazakhstan Textbooks
       if (isKz) {
         const kzBooks = await fetchKazakhstan(query, baseUrl);
         allBooks.push(...kzBooks);
       }
 
-      // 2. IT книги для программирования
+      // 2. Always fetch Google Books (broad integration)
+      const googleBooksPromise = fetchGoogle(query);
+      const openLibPromise = fetchOpenLibrary(query, baseUrl);
+
+      // 3. IT books for programming queries
       if (isProg) {
-        const [itbooks, openlib] = await Promise.all([fetchITBooks(query), fetchOpenLibrary(query, baseUrl)]);
-        allBooks.push(...itbooks, ...openlib);
+        const itBooksPromise = fetchITBooks(query);
+        const [google, openlib, itbooks] = await Promise.all([googleBooksPromise, openLibPromise, itBooksPromise]);
+        allBooks.push(...google, ...itbooks, ...openlib);
       } else {
-        // 3. Глобальный поиск
-        const [google, openlib] = await Promise.all([fetchGoogle(query), fetchOpenLibrary(query, baseUrl)]);
+        const [google, openlib] = await Promise.all([googleBooksPromise, openLibPromise]);
         allBooks.push(...google, ...openlib);
       }
     }
 
-    // Дедупликация
+    // Deduplication
     const seen = new Set<string>();
     const deduped = allBooks.filter(b => {
       const key = `${b.title?.toLowerCase()}-${(b.authors?.[0] || '').toLowerCase()}`;

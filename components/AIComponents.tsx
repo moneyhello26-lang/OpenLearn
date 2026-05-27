@@ -35,6 +35,15 @@ function renderData(data: unknown): React.ReactNode {
 /**
  * University Finder
  */
+interface UniversityRecommendation {
+  name: string;
+  country: string;
+  reason: string;
+  requirements: string;
+  acceptanceRate: number;
+  matchPercentage: number;
+}
+
 export function UniversityFinderForm() {
   const { execute, loading, error, data } = useUniversityFinder();
   const [formData, setFormData] = useState({
@@ -53,7 +62,24 @@ export function UniversityFinderForm() {
     await execute(formData);
   };
 
-  const hasData = data !== undefined && data !== null;
+  const getUniversitiesList = (): UniversityRecommendation[] => {
+    if (!data) return [];
+    
+    // API returns { success: true, data: "string" }
+    const rawData = (data as any)?.data || data;
+    if (typeof rawData === "string") {
+      try {
+        const parsed = JSON.parse(rawData);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const universities = getUniversitiesList();
+  const hasData = universities.length > 0;
 
   const inputStyle: React.CSSProperties = {
     width: '100%', padding: '11px 14px',
@@ -63,13 +89,8 @@ export function UniversityFinderForm() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <h2 className="text-xl font-bold mb-6 flex items-center gap-2"
-        style={{ color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
-        🎓 Поиск университетов
-      </h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="w-full max-w-4xl mx-auto">
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>GPA</label>
@@ -96,23 +117,67 @@ export function UniversityFinderForm() {
         </div>
 
         <button type="submit" disabled={loading}
-          className="btn-primary w-full py-3.5 text-sm disabled:opacity-50"
+          className="btn-glow w-full py-3.5 text-sm disabled:opacity-50 mt-4"
           style={{ fontFamily: 'Sora, sans-serif' }}>
-          {loading ? "⏳ Ищем..." : "🔍 Найти университеты"}
+          {loading ? "⏳ Ищем..." : "🔍 Подобрать вузы"}
         </button>
       </form>
 
       {error && (
-        <div className="mt-4 p-4 rounded-2xl" style={{ background: 'var(--coral-light)', color: 'var(--coral-dark)' }}>
+        <div className="mt-8 p-4 rounded-2xl max-w-2xl mx-auto" style={{ background: 'var(--coral-light)', color: 'var(--coral-dark)' }}>
           {String(error)}
         </div>
       )}
 
       {hasData && (
-        <div className="mt-6 p-5 rounded-2xl max-h-96 overflow-y-auto"
-          style={{ background: 'var(--teal-pale)', border: '1.5px solid var(--teal-light)' }}>
-          <h3 className="font-bold text-sm mb-3" style={{ color: 'var(--teal-dark)' }}>Рекомендации:</h3>
-          <div className="text-sm leading-relaxed prose-sm" style={{ color: 'var(--text)' }}>{renderData(data)}</div>
+        <div className="mt-12">
+          <h3 className="font-bold text-2xl mb-6 text-white text-center">🎯 Подходящие университеты:</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {universities.map((uni, idx) => (
+              <div key={idx} className="bento-card p-6 flex flex-col slide-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h4 className="text-xl font-bold text-white mb-1 leading-tight">{uni.name}</h4>
+                    <span className="text-xs px-2 py-1 rounded-md font-semibold" style={{ background: 'rgba(255,255,255,0.1)', color: 'var(--text-muted)' }}>
+                      📍 {uni.country}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-sm font-bold text-gradient-color">{uni.matchPercentage}%</span>
+                    <span className="text-[10px] uppercase tracking-wider text-muted font-bold">Совпадение</span>
+                  </div>
+                </div>
+
+                <p className="text-sm text-muted mb-6 leading-relaxed flex-grow">
+                  {uni.reason}
+                </p>
+
+                <div className="space-y-4 border-t border-[rgba(255,255,255,0.05)] pt-4 mt-auto">
+                  <div>
+                    <span className="text-xs uppercase font-bold text-muted mb-1 block">Требования:</span>
+                    <p className="text-sm text-white font-medium bg-[rgba(255,255,255,0.03)] p-2 rounded-lg border border-[rgba(255,255,255,0.05)]">
+                      {uni.requirements}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <div className="flex justify-between text-xs font-bold mb-1">
+                      <span className="text-muted">Шанс поступления</span>
+                      <span className="text-white">{uni.acceptanceRate}%</span>
+                    </div>
+                    <div className="w-full rounded-full h-1.5 bg-[rgba(255,255,255,0.1)]">
+                      <div className="h-1.5 rounded-full transition-all duration-1000"
+                        style={{
+                          width: `${uni.acceptanceRate}%`,
+                          background: 'var(--glow-accent)',
+                          boxShadow: '0 0 10px var(--glow-accent)'
+                        }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

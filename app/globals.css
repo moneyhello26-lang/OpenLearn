@@ -300,3 +300,32 @@ body {
 .text-muted {
   color: var(--accents-7);
 }
+
+/* EduVerse Specific Animations & Utilities */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+@keyframes floatSmooth {
+  0%, 100% { transform: translateY(0) translateZ(var(--tz, 0)); }
+  50% { transform: translateY(-15px) translateZ(var(--tz, 0)); }
+}
+
+.float-animation {
+  animation: floatSmooth 6s ease-in-out infinite;
+}
+
+.float-animation-delayed {
+  animation: floatSmooth 7s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+.constellation-bg {
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.05) 2px, transparent 2px),
+    radial-gradient(circle at 70% 60%, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.04) 1.5px, transparent 1.5px);
+  background-size: 100px 100px;
+}

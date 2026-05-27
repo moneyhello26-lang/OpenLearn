@@ -221,13 +221,11 @@ export default function DetailsPage() {
           const found = (data.books || []).find((b: any) => b.id === id);
           if (found) book = { ...found, hasFullText: found.hasPdf ?? false, readerUrl: found.hasPdf ? found.pdfUrl : null, url: found.hasPdf ? found.pdfUrl : found.pageUrl };
         } else if (source === 'google') {
-          const res = await fetch(`https://www.googleapis.com/books/v1/volumes/${key}`);
-          const item = await res.json();
-          if (item.volumeInfo) {
-            const info = item.volumeInfo; const access = item.accessInfo;
-            const hasFullText = access?.viewability === 'ALL_PAGES' || access?.epub?.isAvailable;
-            const readUrl = info.canonicalVolumeLink || info.previewLink;
-            book = { id, title: info.title, authors: info.authors || [], description: info.description || '', image: (info.imageLinks?.thumbnail || '').replace('http:', 'https:'), price: 'Бесплатно', url: readUrl, pageUrl: info.infoLink, source: 'Google Books', hasFullText, readerUrl: hasFullText ? readUrl : null };
+          const res = await fetch(`/api/books/details?id=${id}`);
+          if (res.ok) {
+            book = await res.json();
+          } else {
+            console.error('Failed to fetch google book details', await res.text());
           }
         } else if (source === 'itbook') {
           const res = await fetch(`https://api.itbook.store/1.0/books/${key}`);
