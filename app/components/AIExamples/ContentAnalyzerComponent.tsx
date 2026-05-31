@@ -95,9 +95,9 @@ export function ContentAnalyzerComponent() {
           <h3 className="font-bold text-sm" style={{ color: 'var(--text)' }}>📊 Твои ориентировочные баллы:</h3>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl flex flex-col items-center justify-center border border-[var(--teal-light)] bg-[var(--teal-pale)]">
-              <span className="text-xs font-semibold uppercase tracking-wider text-[var(--teal-dark)] mb-1">IELTS Band</span>
-              <span className="text-3xl font-black text-[var(--teal)]">{analysis.ieltsBand || "N/A"}</span>
+            <div className="p-4 rounded-2xl flex flex-col items-center justify-center border border-(--teal-light) bg-(--teal-pale)">
+              <span className="text-xs font-semibold uppercase tracking-wider text-(--teal-dark) mb-1">IELTS Band</span>
+              <span className="text-3xl font-black text-(--teal)">{analysis.ieltsBand || "N/A"}</span>
             </div>
             
             <div className="p-4 rounded-2xl flex flex-col items-center justify-center border border-purple-900/30 bg-purple-900/10">

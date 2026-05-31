@@ -43,7 +43,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           {/* OpenLearn Logo Modernized */}
-          <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#A87FFB] to-[#8B5CF6] shadow-[0_0_15px_rgba(139,92,246,0.4)]">
+          <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-linear-to-br from-[#A87FFB] to-[#8B5CF6] shadow-[0_0_15px_rgba(139,92,246,0.4)]">
             <span className="text-white text-lg font-black tracking-tighter">OL</span>
           </div>
           <span className="text-2xl font-extrabold tracking-tight text-white" style={{ fontFamily: 'Sora, sans-serif' }}>OpenLearn</span>

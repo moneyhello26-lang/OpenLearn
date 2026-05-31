@@ -13,7 +13,7 @@ export default function AIDemoPage() {
     <div className="min-h-screen pt-36 pb-20 px-6 max-w-5xl mx-auto relative overflow-hidden">
       
       {/* Background glow for AI page */}
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-[120px] opacity-20 pointer-events-none" style={{ background: 'var(--glow-accent)' }}></div>
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-150 h-100 rounded-full blur-[120px] opacity-20 pointer-events-none" style={{ background: 'var(--glow-accent)' }}></div>
 
       <div className="mb-16 slide-up text-center relative z-10">
         <Link href="/" className="text-sm text-muted hover:text-white font-medium mb-6 inline-block transition-colors">&larr; Вернуться</Link>
@@ -25,7 +25,7 @@ export default function AIDemoPage() {
         </p>
       </div>
 
-      <div className="flex justify-center border-b border-[rgba(255,255,255,0.1)] mb-10 overflow-x-auto slide-up delay-1 relative z-10">
+      <div className="flex justify-center border-b border-subtle mb-10 overflow-x-auto slide-up delay-1 relative z-10">
         {[
           { id: 'chat', label: 'Умный чат' },
           { id: 'university', label: 'Подбор вуза' },
@@ -42,13 +42,13 @@ export default function AIDemoPage() {
           >
             {tab.label}
             {activeTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--glow-accent)] shadow-[0_0_10px_var(--glow-accent)]"></div>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-(--glow-accent) shadow-[0_0_10px_var(--glow-accent)]"></div>
             )}
           </button>
         ))}
       </div>
 
-      <div className="bento-card p-6 md:p-10 min-h-[600px] slide-up delay-2 relative z-10">
+      <div className="bento-card p-6 md:p-10 min-h-150 slide-up delay-2 relative z-10">
         {activeTab === 'chat' && <ChatComponent />}
         {activeTab === 'university' && (
           <div className="max-w-2xl mx-auto">

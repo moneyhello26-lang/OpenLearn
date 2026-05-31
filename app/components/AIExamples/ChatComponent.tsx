@@ -55,13 +55,13 @@ export function ChatComponent() {
       {/* Header */}
       <div className="px-6 py-5 flex items-center gap-4 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)]">
         <div className="w-10 h-10 rounded-full flex items-center justify-center relative">
-          <div className="absolute inset-0 bg-[var(--glow-accent)] rounded-full blur-md opacity-50"></div>
+          <div className="absolute inset-0 bg-(--glow-accent) rounded-full blur-md opacity-50"></div>
           <div className="relative text-xl z-10">🧠</div>
         </div>
         <div>
           <h2 className="text-sm font-semibold text-white tracking-widest uppercase">Nexus AI</h2>
-          <p className="text-xs text-[var(--glow-accent)] mt-1 font-medium tracking-wide flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--glow-accent)] shadow-[0_0_8px_var(--glow-accent)] animate-pulse"></span>
+          <p className="text-xs text-(--glow-accent) mt-1 font-medium tracking-wide flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-(--glow-accent) shadow-[0_0_8px_var(--glow-accent)] animate-pulse"></span>
             Online
           </p>
         </div>
@@ -72,7 +72,7 @@ export function ChatComponent() {
         {messages.map((message, index) => (
           <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
             {message.role === "assistant" && (
-              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mr-3 mt-1 flex-shrink-0 text-sm shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mr-3 mt-1 shrink-0 text-sm shadow-[0_0_15px_rgba(255,255,255,0.05)]">
                 AI
               </div>
             )}
@@ -81,7 +81,7 @@ export function ChatComponent() {
               className={`max-w-[80%] px-5 py-4 rounded-2xl text-sm leading-relaxed ${
                 message.role === "user" 
                   ? "bg-[rgba(99,102,241,0.2)] text-white border border-[rgba(99,102,241,0.4)] shadow-[0_0_20px_rgba(99,102,241,0.1)] rounded-tr-sm" 
-                  : "bg-[rgba(255,255,255,0.03)] text-[var(--accents-8)] border border-[rgba(255,255,255,0.08)] rounded-tl-sm"
+                  : "bg-[rgba(255,255,255,0.03)] text-(--accents-8) border border-[rgba(255,255,255,0.08)] rounded-tl-sm"
               }`}
             >
               <p className="whitespace-pre-wrap">{message.content}</p>
@@ -92,13 +92,13 @@ export function ChatComponent() {
         {loading && (
           <div className="flex justify-start items-center">
             <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mr-3 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-               <span className="w-1.5 h-1.5 rounded-full bg-[var(--glow-accent)] animate-pulse"></span>
+               <span className="w-1.5 h-1.5 rounded-full bg-(--glow-accent) animate-pulse"></span>
             </div>
             <div className="px-5 py-4 rounded-2xl rounded-tl-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.08)]">
               <div className="flex space-x-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--glow-accent)] animate-bounce" style={{ animationDelay: '0s' }} />
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--glow-secondary)] animate-bounce" style={{ animationDelay: '0.15s' }} />
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--glow-tertiary)] animate-bounce" style={{ animationDelay: '0.3s' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-(--glow-accent) animate-bounce" style={{ animationDelay: '0s' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-(--glow-secondary) animate-bounce" style={{ animationDelay: '0.15s' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-(--glow-tertiary) animate-bounce" style={{ animationDelay: '0.3s' }} />
               </div>
             </div>
           </div>
@@ -121,7 +121,7 @@ export function ChatComponent() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Введите запрос..."
-            className="w-full py-4 pl-5 pr-16 rounded-xl text-sm bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white focus:bg-[rgba(255,255,255,0.05)] focus:border-[var(--glow-accent)] outline-none transition-all"
+            className="w-full py-4 pl-5 pr-16 rounded-xl text-sm bg-[rgba(255,255,255,0.03)] border border-subtle text-white focus:bg-[rgba(255,255,255,0.05)] focus:border-(--glow-accent) outline-none transition-all"
             maxLength={1000}
           />
           <button type="submit" disabled={loading || !input.trim()}
