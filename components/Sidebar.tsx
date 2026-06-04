@@ -9,6 +9,7 @@ export default function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose
   const navItems = [
     { href: '/', icon: '⌂', label: 'Главная' },
     { href: '/search', icon: '🔍', label: 'Поиск' },
+    { href: '/courses', icon: '🎓', label: 'Курсы' },
     { href: '/favorites', icon: '♥', label: 'Избранное' },
     { href: '/ai-demo', icon: '⚡', label: 'AI Demo' },
     { href: '/profile', icon: '👤', label: 'Профиль' },

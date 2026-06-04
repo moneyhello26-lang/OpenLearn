@@ -32,6 +32,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
 
   const links = [
     { href: '/search', label: 'Библиотека' },
+    { href: '/courses', label: 'Курсы' },
     { href: '/ai-demo', label: 'AI Ассистент' },
     { href: '/about', label: 'О проекте' },
   ];

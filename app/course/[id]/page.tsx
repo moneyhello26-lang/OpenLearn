@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getCourseById } from '@/lib/courses-data';
+import type { CourseData } from '@/lib/courses-data';
 
 interface CourseDetails {
   id: string;
@@ -26,32 +28,19 @@ interface CommentItem {
   replies: CommentItem[];
 }
 
-const MOCK_COURSES: CourseDetails[] = [
-  {
-    id: 'course-1',
-    title: 'Введение в React',
-    authors: ['Иван Петров'],
-    description: 'Полный курс по React для начинающих разработчиков. Вы научитесь создавать современные веб-приложения с использованием React, TypeScript и лучших практик разработки.\n\nКурс включает:\n• Основы React и JSX\n• Компоненты и пропсы\n• State и жизненный цикл\n• Hooks (useState, useEffect, useContext)\n• HTTP запросы и маршрутизация\n• Создание полноценного приложения',
-    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=400&fit=crop',
-    price: 'Бесплатно', category: 'Программирование', duration: '24 часа', level: 'Начинающий',
-  },
-  {
-    id: 'course-2',
-    title: 'Основы Python',
-    authors: ['Анна Сидорова'],
-    description: 'Изучите Python с нуля до продвинутого уровня.\n\n• Синтаксис Python\n• Переменные и типы данных\n• Условные операторы и циклы\n• Функции и модули\n• Работа с файлами\n• ООП в Python\n• Исключения и обработка ошибок',
-    image: 'https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=600&h=400&fit=crop',
-    price: 'Бесплатно', category: 'Программирование', duration: '18 часов', level: 'Начинающий',
-  },
-  {
-    id: 'course-3',
-    title: 'UX/UI Дизайн',
-    authors: ['Мария Иванова'],
-    description: 'Научитесь создавать красивые и удобные пользовательские интерфейсы.\n\n• Принципы UX дизайна\n• Wireframing и прототипирование\n• Работа с Figma\n• Цветовая теория и типографика\n• Адаптивный дизайн',
-    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=400&fit=crop',
-    price: 'Бесплатно', category: 'Дизайн', duration: '15 часов', level: 'Средний',
-  },
-];
+function courseDataToDetails(cd: CourseData): CourseDetails {
+  return {
+    id: cd.id,
+    title: cd.title,
+    authors: cd.authors,
+    description: cd.description,
+    image: cd.image,
+    price: cd.price,
+    category: cd.category,
+    duration: cd.duration,
+    level: cd.level,
+  };
+}
 
 function Stars({ value, onChange }: { value: number; onChange?: (v: number) => void }) {
   const [hover, setHover] = useState(0);
@@ -184,8 +173,8 @@ export default function CourseDetailsPage() {
   }, []);
 
   useEffect(() => {
-    const found = MOCK_COURSES.find(c => c.id === id) || null;
-    setCourse(found);
+    const cd = getCourseById(id);
+    setCourse(cd ? courseDataToDetails(cd) : null);
     setLoading(false);
   }, [id]);
 
@@ -295,7 +284,7 @@ export default function CourseDetailsPage() {
       <div style={{ textAlign: 'center' }}>
         <p style={{ fontSize: '48px', marginBottom: '12px' }}>🎓</p>
         <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text)', marginBottom: '12px' }}>Курс не найден</h1>
-        <Link href="/search" style={{ color: 'var(--teal)', fontWeight: 600 }}>← Назад к поиску</Link>
+        <Link href="/courses" style={{ color: 'var(--teal)', fontWeight: 600 }}>← Назад к курсам</Link>
       </div>
     </div>
   );
@@ -304,7 +293,7 @@ export default function CourseDetailsPage() {
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <div style={{ maxWidth: '860px', margin: '0 auto', padding: '32px 20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-        <Link href="/search" style={{ color: 'var(--teal)', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}>← Назад к поиску</Link>
+        <Link href="/courses" style={{ color: 'var(--teal)', fontSize: '14px', fontWeight: 600, textDecoration: 'none' }}>← Назад к курсам</Link>
 
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.06)' }}>
           <div style={{ position: 'relative', height: '280px' }}>
