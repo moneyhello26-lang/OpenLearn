@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if book already exists
     const existingBook = await prisma.book.findUnique({
       where: {
         source_sourceId: {
@@ -65,7 +64,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Get books with filtering and pagination
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)

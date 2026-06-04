@@ -5,9 +5,6 @@ interface UseAIRequestOptions {
   onError?: (error: string) => void;
 }
 
-/**
- * Hook for making AI requests to the API
- */
 export function useAIRequest<T = unknown>(
   endpoint: string,
   options: UseAIRequestOptions = {}
@@ -63,23 +60,14 @@ export function useAIRequest<T = unknown>(
   };
 }
 
-/**
- * Hook for university recommendations
- */
 export function useUniversityFinder() {
   return useAIRequest("/api/ai/universities");
 }
 
-/**
- * Hook for asking questions
- */
 export function useAskAI() {
   return useAIRequest("/api/ai/ask");
 }
 
-/**
- * Hook for generating descriptions
- */
 export function useGenerateDescription() {
   return useAIRequest("/api/ai/generate-description");
 }

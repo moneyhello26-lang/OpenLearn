@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
 
     const { gpa, sat, ielts, specialization, countryPreference } = body;
 
-    // Validate required fields
     if (!gpa || !specialization) {
       return NextResponse.json(
         { error: "GPA and specialization are required" },
@@ -15,7 +14,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate GPA range
     if (gpa < 0 || gpa > 4.0) {
       return NextResponse.json(
         { error: "GPA must be between 0 and 4.0" },

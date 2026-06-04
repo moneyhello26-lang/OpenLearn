@@ -252,7 +252,7 @@ export default function DetailsPage() {
       setLoading(false);
 
       if (book) {
-        // Register in DB
+        
         const bid = await ensureBook(book);
         if (bid) {
           dbBookIdRef.current = bid;
@@ -300,13 +300,13 @@ export default function DetailsPage() {
         });
         if (res.ok || res.status === 201) setIsFavorite(true);
         else if (res.status === 400) {
-          // Already in favorites (race condition) - just mark as favorite
+          
           const e = await res.json();
           if (e.error === 'Book already in favorites') setIsFavorite(true);
           else console.error('fav error', e);
         }
       } else {
-        // Find and delete
+        
         const res = await fetch('/api/favorites?limit=50', { headers: { Authorization: `Bearer ${token}` } });
         if (res.ok) {
           const d = await res.json();
@@ -332,13 +332,13 @@ export default function DetailsPage() {
     }
     setSubmitting(true);
     try {
-      // Rating
+      
       await fetch(`/api/books/${bid}/ratings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ score: userRating }),
       });
-      // Comment
+      
       const res = await fetch(`/api/books/${bid}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -373,9 +373,9 @@ export default function DetailsPage() {
 
         <Link href="/search" style={{ color:'var(--teal)', fontSize:'14px', fontWeight:600, textDecoration:'none' }}>← Назад к поиску</Link>
 
-        {/* Book card */}
+        {}
         <div style={{ background:'var(--surface)', border:'1.5px solid var(--gray)', borderRadius:'20px', overflow:'hidden', boxShadow:'0 2px 16px rgba(0,0,0,0.06)' }}>
-          {/* Hero cover */}
+          {}
           <div style={{ position:'relative', height:'240px', background: mainBook.image ? undefined : 'linear-gradient(135deg, var(--teal), var(--coral))' }}>
             {mainBook.image && <img src={mainBook.image} alt={mainBook.title} style={{ width:'100%', height:'100%', objectFit:'cover', filter:'blur(3px) brightness(0.6)', transform:'scale(1.06)' }} />}
             <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 50%)' }} />
@@ -399,7 +399,7 @@ export default function DetailsPage() {
             </div>
             <p style={{ fontSize:'14px', color:'var(--text-muted)', lineHeight:1.75, marginBottom:'18px' }}>{mainBook.description || 'Описание отсутствует.'}</p>
 
-            {/* Action buttons */}
+            {}
             <div style={{ display:'flex', flexWrap:'wrap', gap:'10px' }}>
               {mainBook.hasFullText && mainBook.readerUrl && (
                 <Link href={`/reader?src=${encodeURIComponent(mainBook.readerUrl)}&title=${encodeURIComponent(mainBook.title)}&back=${encodeURIComponent('/details/'+id)}`}
@@ -423,7 +423,7 @@ export default function DetailsPage() {
           </div>
         </div>
 
-        {/* Editions */}
+        {}
         {(searchingEditions || editions.length > 0) && (
           <div style={{ background:'var(--surface)', border:'1.5px solid var(--gray)', borderRadius:'20px', padding:'24px' }}>
             <h2 style={{ fontSize:'18px', fontWeight:700, color:'var(--text)', marginBottom:'16px', display:'flex', alignItems:'center', gap:'8px' }}>
@@ -452,14 +452,14 @@ export default function DetailsPage() {
           </div>
         )}
 
-        {/* Comments */}
+        {}
         <div style={{ background:'var(--surface)', border:'1.5px solid var(--gray)', borderRadius:'20px', padding:'24px' }}>
           <h2 style={{ fontSize:'18px', fontWeight:700, color:'var(--text)', marginBottom:'20px' }}>
             💬 Отзывы и комментарии
             {ratingCount > 0 && <span style={{ fontSize:'14px', fontWeight:400, color:'var(--text-muted)', marginLeft:'10px' }}>★ {avgRating.toFixed(1)} · {ratingCount} {ratingCount===1?'отзыв':'отзывов'}</span>}
           </h2>
 
-          {/* Add comment */}
+          {}
           <div style={{ background:'var(--bg)', border:'1.5px solid var(--gray)', borderRadius:'16px', padding:'18px', marginBottom:'24px' }}>
             {authUser ? (
               <>
@@ -483,7 +483,7 @@ export default function DetailsPage() {
             )}
           </div>
 
-          {/* Comments list */}
+          {}
           {commentsLoading ? (
             <div style={{ textAlign:'center', padding:'30px' }}>
               <div className="animate-spin" style={{ width:'36px', height:'36px', border:'3px solid var(--teal-light)', borderTopColor:'var(--teal)', borderRadius:'50%', margin:'0 auto' }} />

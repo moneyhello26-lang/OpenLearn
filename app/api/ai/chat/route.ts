@@ -1,4 +1,4 @@
-// app/api/ai/chat/route.ts
+
 import { generateChatResponse } from "@/lib/ai";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate message structure
     const validMessages = messages.every(
       (msg) =>
         msg.role && (msg.role === "user" || msg.role === "assistant") && msg.content

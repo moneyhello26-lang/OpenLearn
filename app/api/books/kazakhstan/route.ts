@@ -56,7 +56,7 @@ const KZ_TEXTBOOKS = [
     description: 'Интеграл, уравнения, неравенства. Подготовка к ЕНТ.',
     grade: 11, subject: 'Алгебра', language: 'Русский',
   },
-  // ===== ГЕОМЕТРИЯ =====
+  
   {
     id: 'kz-geometry-7-ru', title: 'Геометрия. 7 класс',
     authors: ['Шыныбеков А.Н.'],
@@ -87,7 +87,7 @@ const KZ_TEXTBOOKS = [
     description: 'Тела вращения, объёмы, координаты в пространстве.',
     grade: 11, subject: 'Геометрия', language: 'Русский',
   },
-  // ===== ФИЗИКА =====
+  
   {
     id: 'kz-physics-7-ru', title: 'Физика. 7 класс',
     authors: ['Туякбаев Б.К.'],
@@ -118,7 +118,7 @@ const KZ_TEXTBOOKS = [
     description: 'Электродинамика, колебания и волны, оптика, квантовая и ядерная физика.',
     grade: 11, subject: 'Физика', language: 'Русский',
   },
-  // ===== ИНФОРМАТИКА =====
+  
   {
     id: 'kz-cs-5-ru', title: 'Информатика. 5 класс',
     authors: ['Балапанов Е.Х.', 'Бөрібаев Б.'],
@@ -168,9 +168,9 @@ const KZ_TEXTBOOKS = [
   type: 'book',
   category: 'Казахстан. Школьная программа',
   source: 'okulyk.com (МОН РК)',
-  // Прямая страница на okulyk.com — там можно читать онлайн или скачать PDF
+  
   pageUrl: okulykUrl(b.grade, b.subject),
-  hasPdf: false,    // редирект на okulyk.com, они сами дают PDF
+  hasPdf: false,    
   readerUrl: null,
   url: okulykUrl(b.grade, b.subject),
 }));

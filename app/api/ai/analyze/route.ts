@@ -1,4 +1,4 @@
-// app/api/ai/analyze/route.ts
+
 import { analyzeContent } from "@/lib/ai";
 import { NextRequest, NextResponse } from "next/server";
 

@@ -1,10 +1,4 @@
-// lib/ai.examples.complete.ts
-/**
- * ПОЛНЫЕ ПРИМЕРЫ ИСПОЛЬЗОВАНИЯ AI ИНТЕГРАЦИИ В NEXT.JS
- * 
- * Этот файл содержит практические примеры всех способов использования AI
- * Копируй нужные примеры в свой код!
- */
+
 
 import {
   generateAIResponse,
@@ -31,13 +25,6 @@ import {
   generatePerspectives,
 } from "@/lib/ai-utils";
 
-// ========================================
-// 1️⃣ БАЗОВЫЕ ПРИМЕРЫ
-// ========================================
-
-/**
- * Простой текстовый запрос
- */
 export async function exampleSimplePrompt() {
   const response = await generateAIResponse(
     "Расскажи в 3 предложениях о том, как учиться более эффективно"
@@ -46,15 +33,12 @@ export async function exampleSimplePrompt() {
   return response;
 }
 
-/**
- * С контролем параметров
- */
 export async function exampleWithParameters() {
   const response = await generateAIResponse(
     "Придумай 5 креативных названий для образовательной платформы",
-    "gemini-1.5-pro", // модель
+    "gemini-1.5-pro", 
     {
-      temperature: 0.9, // креативнее
+      temperature: 0.9, 
       maxTokens: 1000,
     }
   );
@@ -62,22 +46,12 @@ export async function exampleWithParameters() {
   return response;
 }
 
-/**
- * Выбор модели в зависимости от задачи
- */
 export async function exampleModelSelection(task: "fast" | "accurate") {
   const model = task === "fast" ? "gemini-1.5-flash" : "gemini-1.5-pro";
   const response = await generateAIResponse("Твой вопрос", model);
   return response;
 }
 
-// ========================================
-// 2️⃣ ЧАТЫ И ДИАЛОГИ
-// ========================================
-
-/**
- * Многотуровый диалог (chat с историей)
- */
 export async function exampleMultiTurnChat() {
   const messages = [
     { role: "user" as const, content: "Привет! Помоги мне с Python" },
@@ -98,9 +72,6 @@ export async function exampleMultiTurnChat() {
   return response;
 }
 
-/**
- * Система со статусом (помощник с характером)
- */
 export async function exampleSystemPrompt(userMessage: string) {
   const systemContext = `Ты опытный учитель Python с 10-летним опытом. 
 Объясняй сложные концепции простым языком. 
@@ -114,13 +85,6 @@ export async function exampleSystemPrompt(userMessage: string) {
   return generateChatResponse(messages);
 }
 
-// ========================================
-// 3️⃣ СПЕЦИАЛИЗИРОВАННЫЕ ЗАПРОСЫ
-// ========================================
-
-/**
- * Генерирование JSON ответов
- */
 export async function exampleGenerateJSON() {
   const result = await generateJSON<{
     title: string;
@@ -176,9 +140,6 @@ export async function exampleTranslate() {
   return translated;
 }
 
-/**
- * Генерирование идей
- */
 export async function exampleGenerateIdeas() {
   const ideas = await generateIdeas(
     "Создать платформу для онлайн обучения",
@@ -188,9 +149,6 @@ export async function exampleGenerateIdeas() {
   return ideas;
 }
 
-/**
- * Проверка грамматики
- */
 export async function exampleCheckGrammar() {
   const text = "Я хочу учиться програмирование";
   const checked = await checkGrammar(text);
@@ -198,9 +156,6 @@ export async function exampleCheckGrammar() {
   return checked;
 }
 
-/**
- * Генерирование вопросов по тексту
- */
 export async function exampleGenerateQuestions() {
   const text =
     "Python - это интерпретируемый язык программирования высокого уровня";
@@ -209,9 +164,6 @@ export async function exampleGenerateQuestions() {
   return questions;
 }
 
-/**
- * Сравнение текстов
- */
 export async function exampleCompareTexts() {
   const text1 = "Python - это язык программирования";
   const text2 = "JavaScript - это язык программирования";
@@ -221,9 +173,6 @@ export async function exampleCompareTexts() {
   return comparison;
 }
 
-/**
- * Структурирование неструктурированных данных
- */
 export async function exampleStructureData() {
   const unstructured =
     "Иван Сидоров, возраст 25, учит Python и Web Development, живет в Москве";
@@ -253,9 +202,6 @@ export async function exampleSEO() {
   return seo;
 }
 
-/**
- * Генерирование контента по шаблону
- */
 export async function exampleGenerateContent() {
   const template = "Курс по {language} для {level}";
   const variables = {
@@ -268,9 +214,6 @@ export async function exampleGenerateContent() {
   return content;
 }
 
-/**
- * Множественные вопросы
- */
 export async function exampleAskMultiple() {
   const answers = await askMultiple([
     "Что такое Python?",
@@ -282,9 +225,6 @@ export async function exampleAskMultiple() {
   return answers;
 }
 
-/**
- * Генерирование разных точек зрения
- */
 export async function exampleGeneratePerspectives() {
   const perspectives = await generatePerspectives(
     "Нужно ли учить Python новичкам?"
@@ -294,13 +234,6 @@ export async function exampleGeneratePerspectives() {
   return perspectives;
 }
 
-// ========================================
-// 4️⃣ ИНТЕГРАЦИЯ С БАЗОЙ ДАННЫХ
-// ========================================
-
-/**
- * Модерация контента перед сохранением в БД
- */
 export async function exampleModerateAndSave(
   comment: string
 ): Promise<boolean> {
@@ -311,27 +244,20 @@ export async function exampleModerateAndSave(
     return false;
   }
 
-  // Сохраняем в БД
   console.log("Comment approved, saving to DB...");
   return true;
 }
 
-/**
- * Автоматическое генерирование описания при создании курса
- */
 export async function exampleAutoGenerateDescription(
   courseTitle: string,
   courseSubject: string
 ) {
   const description = await generateDescription(courseTitle, courseSubject);
   console.log("Auto-generated description:", description);
-  // Сохраняем в БД вместе с курсом
+  
   return description;
 }
 
-/**
- * Поиск университетов по профилю студента
- */
 export async function exampleFindUniversities() {
   const universities = await findUniversities({
     gpa: 3.8,
@@ -345,9 +271,6 @@ export async function exampleFindUniversities() {
   return universities;
 }
 
-/**
- * Ответ на вопрос пользователя с контекстом из БД
- */
 export async function exampleAnswerWithContext(
   question: string,
   courseContext: string
@@ -357,13 +280,6 @@ export async function exampleAnswerWithContext(
   return answer;
 }
 
-// ========================================
-// 5️⃣ СЛОЖНЫЕ ПРИМЕРЫ
-// ========================================
-
-/**
- * Обработка пользовательского контента через несколько AI операций
- */
 export async function examplePipelineProcessing(userText: string) {
   console.log("1. Checking grammar...");
   const grammar = await checkGrammar(userText);
@@ -389,9 +305,6 @@ export async function examplePipelineProcessing(userText: string) {
   };
 }
 
-/**
- * Умная рекомендация курсов
- */
 export async function exampleSmartCourseRecommendation(
   userInterests: string[],
   userLevel: string
@@ -404,9 +317,6 @@ export async function exampleSmartCourseRecommendation(
   return ideas;
 }
 
-/**
- * Автоматическая подготовка FAQ из документации
- */
 export async function exampleGenerateFAQ(documentation: string) {
   const questions = await generateQuestions(documentation, 10);
 
@@ -421,16 +331,12 @@ export async function exampleGenerateFAQ(documentation: string) {
   return faq;
 }
 
-/**
- * A/B тестирование текстов
- */
 export async function exampleABTestContent() {
   const variantA = "Нажми кнопку для регистрации";
   const variantB = "Присоединись к тысячам студентов бесплатно";
 
   const analysis = await compareTexts(variantA, variantB);
 
-  // Оцениваем какой лучше
   const evaluation = await generateJSON(
     `Какой текст будет более эффективен для CTA кнопки: "${variantA}" или "${variantB}"? 
 Дай оценку по критериям: привлекательность, ясность, конверсионность.`
@@ -439,13 +345,6 @@ export async function exampleABTestContent() {
   return evaluation;
 }
 
-// ========================================
-// 6️⃣ ОБРАБОТКА ОШИБОК И RETRY ЛОГИКА
-// ========================================
-
-/**
- * Запрос с автоматическим повтором при ошибке
- */
 export async function exampleWithRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
@@ -460,16 +359,13 @@ export async function exampleWithRetry<T>(
 
       console.log(`Failed, waiting ${delay}ms before retry...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
-      delay *= 2; // exponential backoff
+      delay *= 2; 
     }
   }
 
   throw new Error("Max retries exceeded");
 }
 
-/**
- * Использование retry
- */
 export async function exampleUsingRetry() {
   const result = await exampleWithRetry(
     () => generateAIResponse("Твой вопрос"),
@@ -479,36 +375,8 @@ export async function exampleUsingRetry() {
   return result;
 }
 
-// ========================================
-// ЗАПУСК ПРИМЕРОВ
-// ========================================
-
-/**
- * Главная функция для запуска примеров
- * Раскомментируй нужные примеры для тестирования
- */
 export async function runAllExamples() {
   try {
-    // Базовые примеры
-    // await exampleSimplePrompt();
-    // await exampleWithParameters();
-
-    // Чаты
-    // await exampleMultiTurnChat();
-
-    // JSON
-    // await exampleGenerateJSON();
-
-    // Классификация
-    // await exampleClassifyText();
-
-    // Суммаризация
-    // await exampleSummarize();
-
-    // Перевод
-    // await exampleTranslate();
-
-    // И так далее...
 
     console.log("Examples completed!");
   } catch (error) {

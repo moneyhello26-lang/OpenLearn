@@ -1,7 +1,5 @@
 import { generateAIResponse, generateChatResponse, findUniversities, generateDescription, answerQuestion } from "@/lib/ai";
 
-
-//ТЕКСТОВЫЙ ЗАПРОС
 async function example1_simplePrompt() {
   const response = await generateAIResponse(
     "Расскажи о истории образования в Казахстане в 3 предложениях"
@@ -9,18 +7,15 @@ async function example1_simplePrompt() {
   console.log(response);
 }
 
-// Temperature контролирует креативность (0.1 - консервативно, 0.9 - креативно)
 async function example2_withTemperature() {
   const response = await generateAIResponse(
     "Придумай креативное название для онлайн платформы обучения",
     "gemini-1.5-flash",
-    { temperature: 0.9 } // Более креативно
+    { temperature: 0.9 } 
   );
   console.log(response);
 }
 
-
-// 3. РЕКОМЕНДАЦИЯ УНИВЕРСИТЕТОВ
 async function example3_universityRecommendations() {
   const recommendations = await findUniversities({
     gpa: 3.8,
@@ -32,17 +27,12 @@ async function example3_universityRecommendations() {
   console.log(recommendations);
 }
 
-
-
-// 5. ОТВЕТ НА ВОПРОС ПОЛЬЗОВАТЕЛЯ
 async function example5_answerQuestion() {
   const answer = await answerQuestion(
     "Какие предметы нужны для изучения компьютерных наук?"
   );
   console.log(answer);
 }
-
-// 6. ДИАЛОГ С ИСТОРИЕЙ (MULTI-TURN)
 
 async function example6_chatWithHistory() {
   const messages = [
@@ -64,8 +54,6 @@ async function example6_chatWithHistory() {
   console.log(response);
 }
 
-
-// 9. ДОКУМЕНТ ДЛЯ КОНТЕКСТА
 async function example9_withContext() {
   const bookContent = `
     "Война и мир" - роман Льва Толстого о войне 1812 года
@@ -79,8 +67,6 @@ async function example9_withContext() {
   );
   console.log(answer);
 }
-
-
 
 export {
   example1_simplePrompt,

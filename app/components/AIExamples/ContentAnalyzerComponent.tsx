@@ -1,4 +1,4 @@
-// app/components/AIExamples/ContentAnalyzerComponent.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -24,7 +24,6 @@ export function ContentAnalyzerComponent() {
     if (!rawData || typeof rawData !== "object") return null;
     const obj = rawData as Record<string, unknown>;
 
-    // API normally returns { analysis: { ieltsBand, ... } }
     if ("analysis" in obj && typeof obj.analysis === "object" && obj.analysis !== null) {
       const a = obj.analysis as Record<string, unknown>;
       return {

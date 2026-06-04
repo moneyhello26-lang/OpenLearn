@@ -23,7 +23,7 @@ async function fetchKazakhstan(query: string, baseUrl: string) {
 
 async function fetchGoogle(query: string) {
   try {
-    // Add API key if available in env to prevent rate limits
+    
     const apiKey = process.env.GOOGLE_API_KEY ? `&key=${process.env.GOOGLE_API_KEY}` : '';
     // Fetch all materials, up to 20 results
     const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20${apiKey}`);
@@ -50,7 +50,7 @@ async function fetchGoogle(query: string) {
         type: 'book',
         category: 'Google Library',
         hasFullText,
-        // Pass special prefix 'google:' followed by volume ID to our reader
+        
         readerUrl: hasFullText ? `google:${item.id}` : null,
       };
     });
@@ -106,17 +106,15 @@ export async function GET(request: NextRequest) {
     const isKz = isKzQuery(query);
 
     if (type !== 'course') {
-      // 1. Kazakhstan Textbooks
+      
       if (isKz) {
         const kzBooks = await fetchKazakhstan(query, baseUrl);
         allBooks.push(...kzBooks);
       }
 
-      // 2. Always fetch Google Books (broad integration)
       const googleBooksPromise = fetchGoogle(query);
       const openLibPromise = fetchOpenLibrary(query, baseUrl);
 
-      // 3. IT books for programming queries
       if (isProg) {
         const itBooksPromise = fetchITBooks(query);
         const [google, openlib, itbooks] = await Promise.all([googleBooksPromise, openLibPromise, itBooksPromise]);
@@ -127,7 +125,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Deduplication
     const seen = new Set<string>();
     const deduped = allBooks.filter(b => {
       const key = `${b.title?.toLowerCase()}-${(b.authors?.[0] || '').toLowerCase()}`;

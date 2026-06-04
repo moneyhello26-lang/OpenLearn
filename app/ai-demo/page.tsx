@@ -12,7 +12,7 @@ export default function AIDemoPage() {
   return (
     <div className="min-h-screen pt-36 pb-20 px-6 max-w-5xl mx-auto relative overflow-hidden">
       
-      {/* Background glow for AI page */}
+      {}
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-150 h-100 rounded-full blur-[120px] opacity-20 pointer-events-none" style={{ background: 'var(--glow-accent)' }}></div>
 
       <div className="mb-16 slide-up text-center relative z-10">

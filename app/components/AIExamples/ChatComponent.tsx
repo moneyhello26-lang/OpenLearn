@@ -52,7 +52,7 @@ export function ChatComponent() {
     <div className="w-full max-w-4xl mx-auto flex flex-col rounded-2xl overflow-hidden relative"
       style={{ height: '600px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(20px)' }}>
 
-      {/* Header */}
+      {}
       <div className="px-6 py-5 flex items-center gap-4 border-b border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)]">
         <div className="w-10 h-10 rounded-full flex items-center justify-center relative">
           <div className="absolute inset-0 bg-(--glow-accent) rounded-full blur-md opacity-50"></div>
@@ -67,7 +67,7 @@ export function ChatComponent() {
         </div>
       </div>
 
-      {/* Messages */}
+      {}
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.map((message, index) => (
           <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -113,7 +113,7 @@ export function ChatComponent() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
+      {}
       <div className="p-4 bg-[rgba(0,0,0,0.5)] border-t border-[rgba(255,255,255,0.05)]">
         <form onSubmit={handleSend} className="relative flex items-center">
           <input

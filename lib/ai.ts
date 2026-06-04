@@ -22,22 +22,15 @@ interface AIGenerateOptions {
   topP?: number;
 }
 
-/**
- * Generate text using Google Gemini API
- * @param prompt The prompt to send to the AI
- * @param model The model to use (default: gemini-1.5-flash for speed)
- * @param options Additional generation options
- * @returns The generated text response
- */
 export async function generateAIResponse(
   prompt: string,
   model: AIModel = "gemini-flash-latest",
   options: AIGenerateOptions = {}
 ): Promise<string> {
   if (!apiKey) {
-    // Graceful fallback when no API key is provided
+    
     console.warn("GEMINI_API is not set. Returning mock AI response.");
-    await new Promise(r => setTimeout(r, 1500)); // Simulate network latency
+    await new Promise(r => setTimeout(r, 1500)); 
     if (prompt.includes("category")) return JSON.stringify({ isSafe: true, category: "Educational", confidence: 0.98 });
     if (prompt.includes("JSON")) return JSON.stringify({ data: "Mock JSON response" });
     return "💡 Это демонстрационный ответ, так как API-ключ Gemini не настроен. Пожалуйста, добавьте `GEMINI_API=ваш_ключ` в файл `.env.local`, чтобы включить настоящую генерацию.";
@@ -67,12 +60,6 @@ export async function generateAIResponse(
   }
 }
 
-/**
- * Generate chat response with conversation history
- * @param messages Array of messages in conversation
- * @param model The model to use
- * @param options Additional generation options
- */
 export async function generateChatResponse(
   messages: Array<{ role: "user" | "assistant"; content: string }>,
   model: AIModel = "gemini-flash-latest",
@@ -112,9 +99,6 @@ export async function generateChatResponse(
   }
 }
 
-/**
- * Find suitable universities based on student profile
- */
 export async function findUniversities(studentProfile: {
   gpa: number;
   sat?: number;
@@ -131,57 +115,112 @@ Student Profile:
 - Desired Specialization: ${studentProfile.specialization}
 - Country Preference: ${studentProfile.countryPreference || "No preference"}
 
-Respond ONLY with valid JSON in this exact format (an array of objects):
+CRITICAL INSTRUCTION: You MUST strictly evaluate the student's GPA, SAT, and IELTS scores. If their GPA is low (e.g., < 3.0), DO NOT recommend top-tier elite universities. Recommend universities where the student has a realistic chance of admission based on their exact scores. In the "reason" field, explicitly mention how their specific GPA and scores make them a realistic candidate.
+
+Respond ONLY with valid JSON in this exact format (an array of objects). Use REAL, existing universities. DO NOT invent names. Answer in Russian (except for the university name):
 [
   {
-    "name": "University Name",
-    "country": "Country Code or Name",
-    "reason": "Why it's a good fit",
-    "requirements": "Application requirements",
+    "name": "Actual Real University Name",
+    "country": "Country",
+    "reason": "Explicitly mention why their specific GPA/scores fit this university",
+    "requirements": "Real admission requirements",
     "acceptanceRate": 43,
     "matchPercentage": 95
   }
 ]`;
 
-  const fallbackData = JSON.stringify([
-    {
-      "name": `National Institute of ${studentProfile.specialization.split(' ')[0] || 'Science'}`,
-      "country": studentProfile.countryPreference || "США",
-      "reason": `Ведущий вуз с фокусом на ${studentProfile.specialization}. Идеально совпадает с вашим GPA ${studentProfile.gpa}.`,
-      "requirements": `GPA ${studentProfile.gpa - 0.2}+, IELTS ${studentProfile.ielts || 6.5}+`,
-      "acceptanceRate": Math.floor(Math.random() * 20) + 5,
-      "matchPercentage": Math.floor(Math.random() * 10) + 90
-    },
-    {
-      "name": `${studentProfile.countryPreference || 'Global'} State University`,
-      "country": studentProfile.countryPreference || "Канада",
-      "reason": `Сильная программа и множество грантов для иностранных студентов.`,
-      "requirements": `GPA 3.5+, IELTS 6.5+`,
-      "acceptanceRate": Math.floor(Math.random() * 30) + 20,
-      "matchPercentage": Math.floor(Math.random() * 15) + 80
-    },
-    {
-      "name": "Tech Academy of Excellence",
-      "country": "Сингапур",
-      "reason": `Престижный университет с преподаванием на английском и фокусом на практику.`,
-      "requirements": `IELTS 6.5+, высокий GPA`,
-      "acceptanceRate": Math.floor(Math.random() * 15) + 10,
-      "matchPercentage": Math.floor(Math.random() * 10) + 75
-    },
-    {
-      "name": `Advanced ${studentProfile.specialization.split(' ')[0] || 'Research'} College`,
-      "country": "Австралия",
-      "reason": `Огромные инвестиции в исследования. Отличный старт для карьеры.`,
-      "requirements": `Высокий GPA, достижения в олимпиадах`,
-      "acceptanceRate": Math.floor(Math.random() * 25) + 15,
-      "matchPercentage": Math.floor(Math.random() * 15) + 70
-    }
-  ]);
+  const isHighGPA = studentProfile.gpa >= 3.5;
+  const spec = studentProfile.specialization || "Computer Science";
+  const country = (studentProfile.countryPreference || "").toLowerCase();
+
+  interface UniEntry { name: string; country: string; req: string; specs: string[] }
+
+  const topPool: UniEntry[] = [
+    { name: "MIT", country: "США", req: "GPA 3.9+, SAT 1500+, IELTS 7.5+", specs: ["Computer Science", "Engineering", "Natural Sciences"] },
+    { name: "Stanford University", country: "США", req: "GPA 3.9+, IELTS 7.0+", specs: ["Computer Science", "Engineering", "Business & Management"] },
+    { name: "Harvard University", country: "США", req: "GPA 3.9+, SAT 1500+, IELTS 7.5+", specs: ["Law", "Medicine & Health", "Business & Management", "Social Sciences"] },
+    { name: "Yale University", country: "США", req: "GPA 3.9+, SAT 1480+, IELTS 7.5+", specs: ["Law", "Arts & Humanities", "Social Sciences"] },
+    { name: "Johns Hopkins University", country: "США", req: "GPA 3.8+, IELTS 7.0+", specs: ["Medicine & Health", "Natural Sciences"] },
+    { name: "University of Toronto", country: "Канада", req: "GPA 3.7+, IELTS 6.5+", specs: ["Computer Science", "Engineering", "Medicine & Health", "Natural Sciences"] },
+    { name: "University of British Columbia", country: "Канада", req: "GPA 3.8+, IELTS 6.5+", specs: ["Natural Sciences", "Engineering", "Arts & Humanities"] },
+    { name: "McGill University", country: "Канада", req: "GPA 3.8+, IELTS 6.5+", specs: ["Medicine & Health", "Law", "Social Sciences"] },
+    { name: "University of Waterloo", country: "Канада", req: "GPA 3.7+, IELTS 6.5+", specs: ["Computer Science", "Engineering"] },
+    { name: "University of Oxford", country: "Великобритания", req: "GPA 3.8+, IELTS 7.5+", specs: ["Law", "Arts & Humanities", "Medicine & Health", "Natural Sciences"] },
+    { name: "University of Cambridge", country: "Великобритания", req: "GPA 3.8+, IELTS 7.5+", specs: ["Engineering", "Natural Sciences", "Medicine & Health"] },
+    { name: "Imperial College London", country: "Великобритания", req: "GPA 3.7+, IELTS 7.0+", specs: ["Engineering", "Computer Science", "Medicine & Health"] },
+    { name: "London School of Economics (LSE)", country: "Великобритания", req: "GPA 3.7+, IELTS 7.0+", specs: ["Business & Management", "Law", "Social Sciences"] },
+    { name: "Technical University of Munich (TUM)", country: "Германия", req: "GPA 3.5+, IELTS 6.5+", specs: ["Engineering", "Computer Science", "Natural Sciences"] },
+    { name: "LMU Munich", country: "Германия", req: "GPA 3.5+, IELTS 6.5+", specs: ["Medicine & Health", "Law", "Social Sciences"] },
+    { name: "Heidelberg University", country: "Германия", req: "GPA 3.5+, IELTS 6.5+", specs: ["Natural Sciences", "Medicine & Health", "Arts & Humanities"] },
+    { name: "Tsinghua University", country: "Китай", req: "GPA 3.8+, HSK 5 / IELTS 6.5+", specs: ["Engineering", "Computer Science"] },
+    { name: "Peking University", country: "Китай", req: "GPA 3.8+, HSK 5 / IELTS 6.5+", specs: ["Law", "Social Sciences", "Arts & Humanities", "Natural Sciences"] },
+    { name: "Fudan University", country: "Китай", req: "GPA 3.7+, HSK 5 / IELTS 6.5+", specs: ["Business & Management", "Medicine & Health"] },
+    { name: "University of Melbourne", country: "Австралия", req: "GPA 3.7+, IELTS 7.0+", specs: ["Law", "Medicine & Health", "Engineering", "Arts & Humanities"] },
+    { name: "University of Sydney", country: "Австралия", req: "GPA 3.7+, IELTS 7.0+", specs: ["Business & Management", "Computer Science", "Natural Sciences"] },
+    { name: "UNSW Sydney", country: "Австралия", req: "GPA 3.6+, IELTS 6.5+", specs: ["Engineering", "Computer Science"] },
+  ];
+
+  const midPool: UniEntry[] = [
+    { name: "Arizona State University (ASU)", country: "США", req: "GPA 2.5+, IELTS 6.0+", specs: ["Computer Science", "Engineering", "Business & Management"] },
+    { name: "University of South Florida (USF)", country: "США", req: "GPA 2.5+, IELTS 6.5+", specs: ["Medicine & Health", "Natural Sciences", "Engineering"] },
+    { name: "Florida International University", country: "США", req: "GPA 2.5+, IELTS 6.0+", specs: ["Business & Management", "Law", "Social Sciences"] },
+    { name: "George Mason University", country: "США", req: "GPA 2.8+, IELTS 6.0+", specs: ["Computer Science", "Arts & Humanities", "Social Sciences"] },
+    { name: "Seneca College", country: "Канада", req: "GPA 2.5+, IELTS 6.0+", specs: ["Computer Science", "Business & Management"] },
+    { name: "Humber College", country: "Канада", req: "GPA 2.5+, IELTS 6.0+", specs: ["Arts & Humanities", "Business & Management", "Engineering"] },
+    { name: "Centennial College", country: "Канада", req: "GPA 2.0+, IELTS 6.0+", specs: ["Engineering", "Computer Science", "Social Sciences"] },
+    { name: "University of Greenwich", country: "Великобритания", req: "GPA 2.8+, IELTS 6.0+", specs: ["Engineering", "Computer Science", "Business & Management"] },
+    { name: "London South Bank University", country: "Великобритания", req: "GPA 2.5+, IELTS 6.0+", specs: ["Law", "Social Sciences", "Arts & Humanities"] },
+    { name: "University of Westminster", country: "Великобритания", req: "GPA 2.8+, IELTS 6.0+", specs: ["Business & Management", "Arts & Humanities", "Medicine & Health"] },
+    { name: "IU International University", country: "Германия", req: "GPA 2.5+, IELTS 6.0+", specs: ["Computer Science", "Business & Management"] },
+    { name: "GISMA Business School", country: "Германия", req: "GPA 2.5+, IELTS 6.0+", specs: ["Business & Management", "Law"] },
+    { name: "EU Business School Munich", country: "Германия", req: "GPA 2.5+, IELTS 6.0+", specs: ["Business & Management", "Social Sciences"] },
+    { name: "Shenzhen University", country: "Китай", req: "GPA 2.8+, HSK 4 / IELTS 5.5+", specs: ["Computer Science", "Engineering"] },
+    { name: "Beijing Institute of Technology", country: "Китай", req: "GPA 2.8+, HSK 4 / IELTS 5.5+", specs: ["Engineering", "Natural Sciences"] },
+    { name: "Sichuan University", country: "Китай", req: "GPA 2.7+, HSK 4 / IELTS 5.5+", specs: ["Medicine & Health", "Arts & Humanities", "Social Sciences"] },
+    { name: "RMIT University", country: "Австралия", req: "GPA 2.8+, IELTS 6.0+", specs: ["Engineering", "Computer Science", "Arts & Humanities"] },
+    { name: "Deakin University", country: "Австралия", req: "GPA 2.6+, IELTS 6.0+", specs: ["Business & Management", "Natural Sciences", "Medicine & Health"] },
+    { name: "Griffith University", country: "Австралия", req: "GPA 2.5+, IELTS 6.0+", specs: ["Law", "Social Sciences", "Engineering"] },
+  ];
+
+  const countryMap: Record<string, string> = {
+    "сша": "США", "канада": "Канада", "великобритания": "Великобритания",
+    "германия": "Германия", "китай": "Китай", "австралия": "Австралия"
+  };
+
+  const matchedCountry = Object.keys(countryMap).find(k => country.includes(k)) 
+    ? countryMap[Object.keys(countryMap).find(k => country.includes(k))!] 
+    : null;
+
+  const pool = isHighGPA ? topPool : midPool;
+
+  let results = pool.filter(u => 
+    u.specs.includes(spec) && (!matchedCountry || u.country === matchedCountry)
+  );
+
+  if (results.length === 0) {
+    results = pool.filter(u => !matchedCountry || u.country === matchedCountry);
+  }
+  if (results.length === 0) {
+    results = pool.filter(u => u.specs.includes(spec));
+  }
+  if (results.length === 0) {
+    results = pool.slice(0, 3);
+  }
+
+  const fallbackData = JSON.stringify(
+    results.slice(0, 3).map((uni, idx) => ({
+      name: uni.name,
+      country: uni.country,
+      reason: `Этот университет известен сильной программой по направлению «${spec}». Ваш GPA ${studentProfile.gpa}${studentProfile.sat ? `, SAT ${studentProfile.sat}` : ""}${studentProfile.ielts ? `, IELTS ${studentProfile.ielts}` : ""} соответствует их требованиям для зачисления.`,
+      requirements: uni.req,
+      acceptanceRate: isHighGPA ? 10 + idx * 8 : 55 + idx * 12,
+      matchPercentage: isHighGPA ? 95 - idx * 3 : 90 - idx * 4
+    }))
+  );
 
   try {
     const response = await generateAIResponse(prompt, "gemini-flash-latest", { temperature: 0.5 });
-    
-    // Fallback if API hit a rate limit or other error
+
     if (response.includes("Ошибка API:")) {
       console.warn("AI API error, using fallback data.");
       return fallbackData; 
@@ -189,7 +228,7 @@ Respond ONLY with valid JSON in this exact format (an array of objects):
 
     const jsonMatch = response.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
-      // Validate that it's actually valid JSON before returning
+      
       try {
         JSON.parse(jsonMatch[0]);
         return jsonMatch[0];
@@ -204,9 +243,6 @@ Respond ONLY with valid JSON in this exact format (an array of objects):
   }
 }
 
-/**
- * Generate book/course description using AI
- */
 export async function generateDescription(
   title: string,
   subject: string,
@@ -221,9 +257,6 @@ The description should be engaging, highlight key learning points, and be suitab
   return generateAIResponse(prompt, "gemini-flash-latest", { temperature: 0.8 });
 }
 
-/**
- * Answer user questions with context
- */
 export async function answerQuestion(
   question: string,
   context?: string
@@ -235,9 +268,6 @@ export async function answerQuestion(
   return generateAIResponse(prompt, "gemini-flash-latest", { temperature: 0.5 });
 }
 
-/**
- * Analyze and moderate content
- */
 export async function analyzeContent(content: string): Promise<{
   ieltsBand?: string;
   toeflScore?: string;
@@ -262,7 +292,6 @@ Respond ONLY with valid JSON in this exact format:
       temperature: 0.3,
     });
 
-    // Mock fallback data in case of API failure or rate limit
     const fallbackData = {
       ieltsBand: "7.0",
       toeflScore: "94",

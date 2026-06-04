@@ -32,9 +32,6 @@ function renderData(data: unknown): React.ReactNode {
   );
 }
 
-/**
- * University Finder
- */
 interface UniversityRecommendation {
   name: string;
   country: string;
@@ -46,15 +43,24 @@ interface UniversityRecommendation {
 
 export function UniversityFinderForm() {
   const { execute, loading, error, data } = useUniversityFinder();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    gpa: number | string;
+    sat: number | string;
+    ielts: number | string;
+    specialization: string;
+    countryPreference: string;
+  }>({
     gpa: 3.8, sat: 1480, ielts: 7.5,
     specialization: "Computer Science",
-    countryPreference: "Canada",
+    countryPreference: "США",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: isNaN(Number(value)) ? value : Number(value) }));
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: value === "" ? "" : isNaN(Number(value)) ? value : Number(value) 
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,8 +70,7 @@ export function UniversityFinderForm() {
 
   const getUniversitiesList = (): UniversityRecommendation[] => {
     if (!data) return [];
-    
-    // API returns { success: true, data: "string" }
+
     const rawData = (data as any)?.data || data;
     if (typeof rawData === "string") {
       try {
@@ -108,12 +113,28 @@ export function UniversityFinderForm() {
 
         <div>
           <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Специализация</label>
-          <input type="text" name="specialization" value={formData.specialization} onChange={handleChange} style={inputStyle} />
+          <select name="specialization" value={formData.specialization} onChange={handleChange} style={inputStyle}>
+            <option value="Computer Science">Computer Science / IT</option>
+            <option value="Business & Management">Business & Management</option>
+            <option value="Engineering">Engineering</option>
+            <option value="Medicine & Health">Medicine & Health</option>
+            <option value="Arts & Humanities">Arts & Humanities</option>
+            <option value="Natural Sciences">Natural Sciences</option>
+            <option value="Law">Law</option>
+            <option value="Social Sciences">Social Sciences</option>
+          </select>
         </div>
 
         <div>
           <label className="block text-sm font-semibold mb-1.5" style={{ color: 'var(--text)' }}>Страна</label>
-          <input type="text" name="countryPreference" value={formData.countryPreference} onChange={handleChange} style={inputStyle} />
+          <select name="countryPreference" value={formData.countryPreference} onChange={handleChange} style={inputStyle}>
+            <option value="США">США (USA)</option>
+            <option value="Великобритания">Великобритания (UK)</option>
+            <option value="Канада">Канада (Canada)</option>
+            <option value="Австралия">Австралия (Australia)</option>
+            <option value="Германия">Германия (Germany)</option>
+            <option value="Китай">Китай (China)</option>
+          </select>
         </div>
 
         <button type="submit" disabled={loading}
@@ -184,9 +205,6 @@ export function UniversityFinderForm() {
   );
 }
 
-/**
- * Ask AI
- */
 export function AskAIComponent() {
   const { execute, loading, error, data } = useAskAI();
   const [question, setQuestion] = useState("");
@@ -253,9 +271,6 @@ export function AskAIComponent() {
   );
 }
 
-/**
- * Generate Description
- */
 export function GenerateDescriptionComponent() {
   const { execute, loading, error, data } = useGenerateDescription();
   const [formData, setFormData] = useState({ title: "", subject: "", context: "book" });

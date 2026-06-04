@@ -1,4 +1,4 @@
-// app/components/AIExamples/SimplePromptComponent.tsx
+
 "use client";
 
 import { useState } from "react";

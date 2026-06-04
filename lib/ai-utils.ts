@@ -1,16 +1,6 @@
-// lib/ai-utils.ts
+
 import { generateAIResponse, generateChatResponse } from "@/lib/ai";
 
-/**
- * Утилиты для удобного использования AI в разных контекстах
- */
-
-/**
- * Генерирует JSON ответ от AI
- * @param prompt Промпт для AI
- * @param schema Пример структуры JSON
- * @returns Распарсенный JSON
- */
 export async function generateJSON<T = Record<string, unknown>>(
   prompt: string,
   schema?: T
@@ -26,7 +16,7 @@ export async function generateJSON<T = Record<string, unknown>>(
   );
 
   try {
-    // Пытаемся найти JSON в ответе
+    
     const jsonMatch = response.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
@@ -38,9 +28,6 @@ export async function generateJSON<T = Record<string, unknown>>(
   }
 }
 
-/**
- * Классифицирует текст на одну из предоставленных категорий
- */
 export async function classifyText(
   text: string,
   categories: string[]
@@ -58,9 +45,6 @@ export async function classifyText(
   return generateJSON(prompt);
 }
 
-/**
- * Суммаризирует текст
- */
 export async function summarizeText(
   text: string,
   maxLength: number = 200
@@ -75,9 +59,6 @@ ${text}`;
   });
 }
 
-/**
- * Переводит текст
- */
 export async function translateText(text: string, targetLang: string): Promise<string> {
   const prompt = `Переведи следующий текст на ${targetLang}:
 
@@ -89,9 +70,6 @@ ${text}`;
   });
 }
 
-/**
- * Генерирует идеи на основе описания
- */
 export async function generateIdeas(
   description: string,
   count: number = 5
@@ -110,9 +88,6 @@ export async function generateIdeas(
   }
 }
 
-/**
- * Проверяет грамматику и стиль текста
- */
 export async function checkGrammar(text: string): Promise<{
   corrected: string;
   issues: Array<{ original: string; suggestion: string; explanation: string }>;
@@ -134,9 +109,6 @@ export async function checkGrammar(text: string): Promise<{
   return generateJSON(prompt);
 }
 
-/**
- * Генерирует вопросы для текста
- */
 export async function generateQuestions(
   text: string,
   count: number = 5
@@ -157,9 +129,6 @@ ${text}
   }
 }
 
-/**
- * Сравнивает два текста
- */
 export async function compareTexts(
   text1: string,
   text2: string
@@ -178,9 +147,6 @@ export async function compareTexts(
   return generateJSON(prompt);
 }
 
-/**
- * Структурирует неструктурированные данные
- */
 export async function structureData(
   unstructuredText: string,
   expectedStructure: Record<string, unknown>
@@ -197,9 +163,6 @@ ${JSON.stringify(expectedStructure, null, 2)}
   return generateJSON(prompt, expectedStructure);
 }
 
-/**
- * Генерирует SEO описание
- */
 export async function generateSEODescription(
   title: string,
   keywords: string[]
@@ -222,9 +185,6 @@ export async function generateSEODescription(
   return generateJSON(prompt);
 }
 
-/**
- * Генерирует контент на основе шаблона
- */
 export async function generateContent(
   template: string,
   variables: Record<string, string>
@@ -246,9 +206,6 @@ ${varsStr}`;
   });
 }
 
-/**
- * Реализует мультиопроса запрос (несколько вопросов сразу)
- */
 export async function askMultiple(
   questions: string[]
 ): Promise<Record<string, string>> {
@@ -266,9 +223,6 @@ ${questions.map((q, i) => `${i + 1}. ${q}`).join("\n")}
   return generateJSON(prompt);
 }
 
-/**
- * Генерирует конфликтующие точки зрения на тему
- */
 export async function generatePerspectives(
   topic: string,
   perspectives: number = 3

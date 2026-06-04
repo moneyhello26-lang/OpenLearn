@@ -260,7 +260,7 @@ export default function CourseDetailsPage() {
     if (!token) { router.push('/auth'); return; }
     setSubmitting(true);
     try {
-      // 1. Save rating
+      
       await fetch('/api/course-ratings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -358,7 +358,6 @@ export default function CourseDetailsPage() {
           <p style={{ fontSize: '14px', color: 'var(--text-muted)', lineHeight: 1.85, whiteSpace: 'pre-line' }}>{course.description}</p>
         </div>
 
-
         <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '20px', padding: '24px' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text)', marginBottom: '20px' }}>
             💬 Отзывы и комментарии
@@ -369,7 +368,7 @@ export default function CourseDetailsPage() {
             )}
           </h2>
 
-          {/* Add comment form */}
+          {}
           <div style={{ background: 'var(--bg)', border: '1.5px solid var(--gray)', borderRadius: '16px', padding: '18px', marginBottom: '24px' }}>
             {authUser ? (
               <>
@@ -394,7 +393,7 @@ export default function CourseDetailsPage() {
             )}
           </div>
 
-          {/* Comments list */}
+          {}
           {commentsLoading ? (
             <div style={{ textAlign: 'center', padding: '30px' }}>
               <div className="animate-spin" style={{ width: '36px', height: '36px', border: '3px solid var(--teal-light)', borderTopColor: 'var(--teal)', borderRadius: '50%', margin: '0 auto' }} />
