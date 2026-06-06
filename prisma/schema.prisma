@@ -25,6 +25,14 @@ model User {
   comments       Comment[]
   courseComments CourseComment[]
   courses        UserCourse[]
+  reviewsWritten       UserReview[] @relation("ReviewAuthor")
+  reviewsReceived      UserReview[] @relation("ReviewTarget")
+  friendRequestsSent   Friendship[] @relation("FriendRequestSender")
+  friendRequestsReceived Friendship[] @relation("FriendRequestReceiver")
+  notifications        Notification[]
+  communitiesCreated   Community[]
+  communityMemberships CommunityMember[]
+  communityMessages    CommunityMessage[]
 
   @@map("users")
 }
@@ -216,4 +224,93 @@ model UserCourse {
   @@index([userId])
   @@index([courseId])
   @@map("user_courses")
+}
+
+model UserReview {
+  id        String   @id @default(cuid())
+  authorId  String
+  targetId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  author    User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  target    User     @relation("ReviewTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([targetId])
+  @@map("user_reviews")
+}
+
+model Friendship {
+  id        String   @id @default(cuid())
+  userId    String
+  friendId  String
+  status    String   @default("pending") // "pending", "accepted", "rejected"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation("FriendRequestSender", fields: [userId], references: [id], onDelete: Cascade)
+  friend    User     @relation("FriendRequestReceiver", fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId])
+  @@index([userId])
+  @@index([friendId])
+  @@map("friendships")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  content   String?
+  sourceId  String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+model Community {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  coverUrl    String?
+  creatorId   String
+  createdAt   DateTime @default(now())
+
+  creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  members     CommunityMember[]
+  messages    CommunityMessage[]
+
+  @@map("communities")
+}
+
+model CommunityMember {
+  id          String   @id @default(cuid())
+  communityId String
+  userId      String
+  role        String   @default("member") // "admin", "member"
+  joinedAt    DateTime @default(now())
+
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@map("community_members")
+}
+
+model CommunityMessage {
+  id          String   @id @default(cuid())
+  communityId String
+  userId      String
+  content     String
+  bookLink    String?
+  createdAt   DateTime @default(now())
+
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("community_messages")
 }

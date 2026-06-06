@@ -109,7 +109,8 @@ export default function FavoritesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {books.map(fav => (
                 <div key={fav.id}
-                  style={{ display: 'flex', gap: '16px', background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '16px', padding: '16px', alignItems: 'flex-start' }}
+                  onClick={() => router.push(`/details/${fav.book.sourceId}`)}
+                  style={{ display: 'flex', gap: '16px', background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '16px', padding: '16px', alignItems: 'flex-start', cursor: 'pointer' }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--teal)'; el.style.boxShadow = '0 4px 16px rgba(61,174,183,0.1)'; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--gray)'; el.style.boxShadow = 'none'; }}>
                   <div style={{ width: '64px', height: '90px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, background: 'var(--coral-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
@@ -124,11 +125,11 @@ export default function FavoritesPage() {
                       <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Добавлено {fmt(fav.addedAt)}</span>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      <Link href={`/details/${fav.book.sourceId}`}
+                      <Link href={`/details/${fav.book.sourceId}`} onClick={(e) => e.stopPropagation()}
                         style={{ padding: '7px 16px', borderRadius: '8px', background: 'var(--teal)', color: 'white', fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}>
                         Открыть →
                       </Link>
-                      <button onClick={() => removeBook(fav.id)}
+                      <button onClick={(e) => { e.stopPropagation(); removeBook(fav.id); }}
                         style={{ padding: '7px 14px', borderRadius: '8px', background: 'var(--coral-light)', color: 'var(--coral-dark)', fontSize: '12px', fontWeight: 600, border: 'none', cursor: 'pointer', fontFamily: 'Sora, sans-serif' }}>
                         ✕ Удалить
                       </button>
@@ -155,7 +156,8 @@ export default function FavoritesPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
               {courses.map(fav => (
                 <div key={fav.id}
-                  style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '16px', overflow: 'hidden' }}
+                  onClick={() => router.push(`/course/${fav.courseExtId}`)}
+                  style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)', borderRadius: '16px', overflow: 'hidden', cursor: 'pointer' }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--teal)'; el.style.boxShadow = '0 4px 16px rgba(61,174,183,0.1)'; }}
                   onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--gray)'; el.style.boxShadow = 'none'; }}>
                   <div style={{ height: '140px', overflow: 'hidden', background: fav.coverUrl ? undefined : 'linear-gradient(135deg, var(--teal), var(--coral))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px' }}>
@@ -166,11 +168,11 @@ export default function FavoritesPage() {
                     {fav.instructor && <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>👤 {fav.instructor}</p>}
                     <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '12px' }}>Добавлено {fmt(fav.addedAt)}</p>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      <Link href={`/course/${fav.courseExtId}`}
+                      <Link href={`/course/${fav.courseExtId}`} onClick={(e) => e.stopPropagation()}
                         style={{ flex: 1, padding: '8px', borderRadius: '8px', background: 'var(--teal)', color: 'white', fontSize: '12px', fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>
                         🚀 Продолжить
                       </Link>
-                      <button onClick={() => removeCourse(fav.courseExtId)}
+                      <button onClick={(e) => { e.stopPropagation(); removeCourse(fav.courseExtId); }}
                         style={{ padding: '8px 12px', borderRadius: '8px', background: 'var(--coral-light)', color: 'var(--coral-dark)', fontSize: '12px', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
                         ✕
                       </button>

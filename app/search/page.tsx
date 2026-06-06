@@ -114,25 +114,42 @@ const HINTS = ['физика', 'математика', 'информатика',
 
 export default function SearchPage() {
   const [query, setQuery] = useState('');
-  const [type, setType] = useState<'all' | 'book' | 'course'>('all');
+  const [type, setType] = useState<'all' | 'book' | 'course' | 'users' | 'communities'>('all');
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [userResults, setUserResults] = useState<any[]>([]);
+  const [communityResults, setCommunityResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const searchBooks = async (q: string, t: string) => {
+  const doSearch = async (q: string, t: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/books/search?q=${encodeURIComponent(q)}&type=${t}`);
-      const data = await res.json();
-      setResults(data.results || []);
-    } catch { setResults([]); }
+      if (t === 'users') {
+        const res = await fetch(`/api/search/users?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        setUserResults(data.results || []);
+        setResults([]); setCommunityResults([]);
+      } else if (t === 'communities') {
+        const res = await fetch(`/api/search/communities?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        setCommunityResults(data.results || []);
+        setResults([]); setUserResults([]);
+      } else {
+        const res = await fetch(`/api/books/search?q=${encodeURIComponent(q)}&type=${t}`);
+        const data = await res.json();
+        setResults(data.results || []);
+        setUserResults([]); setCommunityResults([]);
+      }
+    } catch { setResults([]); setUserResults([]); setCommunityResults([]); }
     setLoading(false);
   };
 
   useEffect(() => {
     if (query.length > 2) {
-      const id = setTimeout(() => searchBooks(query, type), 500);
+      const id = setTimeout(() => doSearch(query, type), 500);
       return () => clearTimeout(id);
-    } else if (query.length === 0) setResults([]);
+    } else if (query.length === 0) {
+      setResults([]); setUserResults([]); setCommunityResults([]);
+    }
   }, [query, type]);
 
   const kzResults = results.filter(r => r.category === 'Казахстан. Школьная программа');
@@ -178,9 +195,11 @@ export default function SearchPage() {
             style={{ background: 'var(--bg)', border: '1.5px solid var(--gray-mid)', color: 'var(--text)' }}>
             <option value="all">Все материалы</option>
             <option value="book">Только книги</option>
+            <option value="users">Люди</option>
+            <option value="communities">Сообщества</option>
           </select>
 
-          <button onClick={() => searchBooks(query, type)}
+          <button onClick={() => doSearch(query, type)}
             style={{ background: 'var(--teal)', color: 'white' }}
             className="px-5 py-2 rounded-xl text-sm font-semibold hover:opacity-90">
             Искать
@@ -206,7 +225,7 @@ export default function SearchPage() {
         </div>
       )}
 
-      {!loading && results.length === 0 && query.length > 2 && (
+      {!loading && results.length === 0 && userResults.length === 0 && communityResults.length === 0 && query.length > 2 && (
         <div className="text-center py-12">
           <p className="text-4xl mb-3">🔍</p>
           <p className="font-semibold" style={{ color: 'var(--text)' }}>Ничего не найдено</p>
@@ -214,7 +233,7 @@ export default function SearchPage() {
         </div>
       )}
 
-      {!loading && results.length === 0 && query.length === 0 && (
+      {!loading && results.length === 0 && userResults.length === 0 && communityResults.length === 0 && query.length === 0 && (
         <div className="text-center py-16">
           <p className="text-5xl mb-4">📚</p>
           <p className="font-semibold text-lg" style={{ color: 'var(--text)' }}>Начните поиск</p>
@@ -243,6 +262,52 @@ export default function SearchPage() {
           </h2>
           <div className="space-y-3">
             {globalResults.map(item => <ResultCard key={item.id} item={item} />)}
+          </div>
+        </div>
+      )}
+
+      {!loading && userResults.length > 0 && (
+        <div>
+          <h2 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
+            👥 Люди
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userResults.map(user => (
+              <Link key={user.id} href={`/user/${user.id}`} className="block group">
+                <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }} className="rounded-2xl p-4 flex gap-4 items-center hover:border-[var(--teal)] transition-all">
+                  <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white font-bold bg-gradient-to-br from-teal-500 to-pink-500">
+                    {user.avatar ? <img src={user.avatar} className="w-full h-full object-cover" /> : user.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm truncate group-hover:text-[var(--teal)] transition-colors">{user.name}</h3>
+                    <p className="text-xs text-[var(--text-muted)] truncate">{user.bio || 'Нет описания'}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!loading && communityResults.length > 0 && (
+        <div>
+          <h2 className="text-base font-bold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
+            💬 Сообщества
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {communityResults.map(c => (
+              <Link key={c.id} href={`/communities/${c.id}`} className="block group">
+                <div style={{ background: 'var(--surface)', border: '1.5px solid var(--gray)' }} className="rounded-2xl p-4 hover:border-[var(--teal)] transition-all h-full">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center text-lg font-bold mb-3">
+                    {c.name.slice(0,1).toUpperCase()}
+                  </div>
+                  <h3 className="font-semibold text-sm mb-1 group-hover:text-[var(--teal)] transition-colors">{c.name}</h3>
+                  <div className="text-xs font-medium text-[var(--teal)] bg-[var(--teal-pale)] w-fit px-2 py-0.5 rounded-full mt-2">
+                    Участников: {c._count.members}
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       )}

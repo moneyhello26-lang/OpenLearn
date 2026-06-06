@@ -419,6 +419,13 @@ export default function DetailsPage() {
                 style={{ padding:'12px 18px', borderRadius:'12px', fontWeight:600, fontSize:'14px', border:'1.5px solid var(--gray)', background:'var(--surface)', color:'var(--text-muted)', textDecoration:'none', display:'inline-block' }}>
                 📚 Моё избранное
               </Link>
+              <button onClick={() => {
+                if (navigator.share) navigator.share({ title: mainBook?.title, url: window.location.href });
+                else { navigator.clipboard.writeText(window.location.href); alert('Ссылка скопирована!'); }
+              }}
+                style={{ padding:'12px 18px', borderRadius:'12px', fontWeight:600, fontSize:'14px', border:'1.5px solid var(--gray)', background:'var(--surface)', color:'var(--text-muted)', cursor:'pointer', fontFamily:'Sora, sans-serif' }}>
+                ↗ Поделиться
+              </button>
             </div>
           </div>
         </div>

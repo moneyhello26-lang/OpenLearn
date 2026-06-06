@@ -22,18 +22,6 @@ interface UserData {
   bio: string | null;
 }
 
-interface HistoryItem {
-  id: string;
-  bookId: string;
-  progress: number;
-  lastReadDate: string;
-  book: {
-    title: string;
-    author: string;
-    coverUrl: string | null;
-  };
-}
-
 interface FavoriteItem {
   id: string;
   bookId: string;
@@ -41,6 +29,7 @@ interface FavoriteItem {
     title: string;
     author: string;
     coverUrl: string | null;
+    sourceId: string;
   };
 }
 
@@ -48,16 +37,17 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Edit Modal State
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', bio: '' });
   const [isSaving, setIsSaving] = useState(false);
 
+  const [friends, setFriends] = useState<{id: string, name: string, avatar: string|null}[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+
   // Stats Data
   const { data: stats, loading: statsLoading, refetch: refetchStats } = useApi<UserStats>('/api/users/me/stats');
   
-  // History & Favorites
-  const { data: historyData, loading: historyLoading } = useApi<{data: HistoryItem[]}>('/api/reading-history?limit=5');
+  // Favorites
   const { data: favoritesData, loading: favoritesLoading } = useApi<{data: FavoriteItem[]}>('/api/favorites?limit=4');
 
   useEffect(() => {
@@ -73,6 +63,12 @@ export default function ProfilePage() {
         const userData = await apiCall<UserData>('/api/users/me', { method: 'GET' });
         setUser(userData);
         setEditForm({ name: userData.name, bio: userData.bio || '' });
+
+        const fListRes = await fetch(`/api/users/${userData.id}/friends`);
+        if (fListRes.ok) setFriends(await fListRes.json());
+
+        const rRes = await fetch(`/api/users/${userData.id}/reviews`);
+        if (rRes.ok) setReviews((await rRes.json()).data || []);
       } catch (error) {
         console.error('Failed to load profile:', error);
       } finally {
@@ -191,16 +187,7 @@ export default function ProfilePage() {
         <span className="text-[var(--glow-accent)]">⚡</span> Статистика обучения
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-16 delay-1 slide-up">
-        <div className="stat-card group">
-          <div className="stat-icon text-indigo-400 group-hover:bg-indigo-500/10 transition-colors">📚</div>
-          <div className="stat-value">{statsLoading ? <div className="h-8 w-12 skeleton mb-2" /> : stats?.booksRead || 0}</div>
-          <div className="stat-label">Прочитано книг</div>
-        </div>
-        <div className="stat-card group">
-          <div className="stat-icon text-purple-400 group-hover:bg-purple-500/10 transition-colors">📖</div>
-          <div className="stat-value">{statsLoading ? <div className="h-8 w-12 skeleton mb-2" /> : stats?.booksInProgress || 0}</div>
-          <div className="stat-label">В процессе чтения</div>
-        </div>
+
         <div className="stat-card group">
           <div className="stat-icon text-pink-400 group-hover:bg-pink-500/10 transition-colors">⭐</div>
           <div className="stat-value">{statsLoading ? <div className="h-8 w-12 skeleton mb-2" /> : stats?.totalFavorites || 0}</div>
@@ -223,48 +210,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 mb-16">
-        {/* 3. Reading History */}
-        <div className="profile-section delay-2 slide-up">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold tracking-tight">Недавняя активность</h2>
-          </div>
-          
-          <div className="space-y-3">
-            {historyLoading ? (
-              [...Array(3)].map((_, i) => <div key={i} className="h-20 skeleton" />)
-            ) : historyData?.data && historyData.data.length > 0 ? (
-              historyData.data.map((item) => (
-                <div key={item.id} className="history-item group cursor-pointer" onClick={() => window.location.href = `/details/${item.bookId}`}>
-                  <div className="book-cover">
-                    {item.book.coverUrl ? <img src={item.book.coverUrl} alt="" /> : '📖'}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm truncate text-white group-hover:text-[var(--glow-accent)] transition-colors">{item.book.title}</h4>
-                    <p className="text-xs text-muted mt-1 truncate">{item.book.author}</p>
-                    <div className="mt-3 flex items-center gap-3">
-                      <div className="reading-progress-track">
-                        <div 
-                          className={`reading-progress-fill ${item.progress === 100 ? 'complete' : ''}`} 
-                          style={{ width: `${Math.max(5, item.progress)}%` }} 
-                        />
-                      </div>
-                      <span className="text-[10px] font-medium text-muted w-8 text-right">{Math.round(item.progress)}%</span>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="text-center p-6 border border-dashed border-[rgba(255,255,255,0.1)] rounded-xl">
-                <p className="text-muted text-sm">История чтения пуста</p>
-                <Link href="/search" className="text-[var(--glow-accent)] text-sm font-medium mt-2 inline-block hover:underline">
-                  Найти книги
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-
+      <div className="mb-16">
         {/* 4. Favorites Snippet */}
         <div className="profile-section delay-3 slide-up">
           <div className="flex items-center justify-between mb-6">
@@ -279,7 +225,7 @@ export default function ProfilePage() {
               [...Array(3)].map((_, i) => <div key={i} className="h-20 skeleton" />)
             ) : favoritesData?.data && favoritesData.data.length > 0 ? (
               favoritesData.data.map((item) => (
-                <div key={item.id} className="history-item group cursor-pointer" onClick={() => window.location.href = `/details/${item.bookId}`}>
+                <div key={item.id} className="history-item group cursor-pointer" onClick={() => window.location.href = `/details/${item.book.sourceId}`}>
                   <div className="book-cover">
                     {item.book.coverUrl ? <img src={item.book.coverUrl} alt="" /> : '⭐'}
                   </div>
@@ -298,6 +244,56 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Friends List */}
+      <div className="profile-section delay-3 slide-up mb-16">
+        <h2 className="text-xl font-bold tracking-tight mb-6">Ваши друзья ({friends.length})</h2>
+        {friends.length === 0 ? (
+          <div className="text-center p-6 border border-dashed border-[rgba(255,255,255,0.1)] rounded-xl">
+            <p className="text-muted text-sm">У вас пока нет друзей</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {friends.map(friend => (
+              <Link key={friend.id} href={`/user/${friend.id}`} className="group block">
+                <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-2xl p-4 flex flex-col items-center text-center hover:border-[var(--glow-accent)] transition-colors">
+                  <div className="w-16 h-16 rounded-full mb-3 bg-gradient-to-br from-teal-500 to-pink-500 flex items-center justify-center text-white text-xl font-bold shadow-lg overflow-hidden">
+                    {friend.avatar ? <img src={friend.avatar} className="w-full h-full object-cover" /> : friend.name.slice(0, 2).toUpperCase()}
+                  </div>
+                  <h4 className="font-semibold text-sm text-white group-hover:text-[var(--glow-accent)] transition-colors truncate w-full">{friend.name}</h4>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Reviews */}
+      <div className="profile-section delay-4 slide-up mb-16">
+        <h2 className="text-xl font-bold tracking-tight mb-6">Отзывы о вас</h2>
+        <div className="space-y-4">
+          {reviews.length === 0 ? (
+            <p className="text-muted italic text-sm text-center py-6 border border-dashed border-[rgba(255,255,255,0.1)] rounded-xl">У вас пока нет ни одного отзыва.</p>
+          ) : (
+            reviews.map(review => (
+              <div key={review.id} className="p-5 rounded-2xl border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] transition-colors hover:bg-[rgba(255,255,255,0.04)]">
+                <div className="flex justify-between items-start mb-3">
+                  <Link href={`/user/${review.author.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-pink-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">
+                      {review.author.avatar ? <img src={review.author.avatar} className="w-full h-full rounded-full object-cover" /> : review.author.name.slice(0,2).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-white">{review.author.name}</p>
+                      <p className="text-xs text-muted mt-0.5">{new Date(review.createdAt).toLocaleDateString('ru-RU')}</p>
+                    </div>
+                  </Link>
+                </div>
+                <p className="text-[rgba(255,255,255,0.8)] text-sm leading-relaxed mt-2">{review.content}</p>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
