@@ -91,7 +91,9 @@ export async function generateChatResponse(
       generationConfig,
     });
 
-    return result.response.text();
+    let text = result.response.text();
+    text = text.replace(/<think>[\s\S]*?<\/think>\n?/ig, '').trim();
+    return text;
   } catch (error) {
     console.error("Error generating chat response:", error);
     const msg = error instanceof Error ? error.message : String(error);
