@@ -84,7 +84,7 @@ export async function generateChatResponse(
     const contents = messages.map((msg, index) => {
       let text = msg.content;
       if (index === messages.length - 1 && msg.role === "user") {
-        text += "\n\n[SYSTEM INSTRUCTION: You MUST strictly separate your internal reasoning from the final answer. First write your reasoning/drafting, then write the exact string '---FINAL_ANSWER---' on a new line, and then write your actual final response for the user below it. DO NOT ignore this instruction.]";
+        text += "\n\n[CRITICAL SYSTEM INSTRUCTION: DO NOT write any internal thoughts, reasoning, scratchpad, or drafting. DO NOT use bullet points to plan. DO NOT write any English. You MUST directly output ONLY the final requested essay/response in Russian. Start your response immediately with the essay text or title.]";
       }
       return {
         role: msg.role === "assistant" ? "model" : msg.role,
