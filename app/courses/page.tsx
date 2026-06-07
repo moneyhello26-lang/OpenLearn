@@ -292,7 +292,7 @@ export default function CoursesPage() {
             <span className="text-xs font-medium text-[#8A8F98]">{ALL_COURSES.length} курсов доступно бесплатно</span>
           </div>
 
-          <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
             <span className="text-white">Каталог </span>
             <span style={{
               background: 'linear-gradient(90deg, #A87FFB 0%, #D946EF 50%, #3B82F6 100%)',

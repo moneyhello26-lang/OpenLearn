@@ -17,7 +17,7 @@ export default function AIDemoPage() {
 
       <div className="mb-16 slide-up text-center relative z-10">
         <Link href="/" className="text-sm text-muted hover:text-white font-medium mb-6 inline-block transition-colors">&larr; Вернуться</Link>
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-4">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter mb-4">
           <span className="text-gradient">AI Ассистент</span>
         </h1>
         <p className="text-xl text-muted max-w-2xl mx-auto">

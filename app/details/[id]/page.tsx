@@ -155,15 +155,15 @@ export default function DetailsPage() {
     }
   }, []);
 
-  const loadComments = useCallback(async (bid?: string) => {
+  const loadComments = useCallback(async (bid?: string, isPolling = false) => {
     const bookId = bid || dbBookIdRef.current;
     if (!bookId) return;
-    setCommentsLoading(true);
+    if (!isPolling) setCommentsLoading(true);
     try {
       const res = await fetch(`/api/books/${bookId}/comments`);
       if (res.ok) { const d = await res.json(); setComments(d.data || []); }
     } catch (e) { console.error('loadComments', e); }
-    setCommentsLoading(false);
+    if (!isPolling) setCommentsLoading(false);
   }, []);
 
   const loadRatings = useCallback(async (bid?: string) => {
@@ -280,6 +280,15 @@ export default function DetailsPage() {
       }
     };
     fetch_();
+    
+    const interval = setInterval(() => {
+      if (dbBookIdRef.current) {
+        loadComments(dbBookIdRef.current, true);
+        loadRatings(dbBookIdRef.current);
+      }
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [id, ensureBook, loadComments, loadRatings, checkFavorite]);
 
   const toggleFavorite = async () => {

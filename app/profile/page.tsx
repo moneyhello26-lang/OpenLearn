@@ -77,6 +77,21 @@ export default function ProfilePage() {
     };
     
     fetchUser();
+    
+    const interval = setInterval(async () => {
+      const localUserStr = localStorage.getItem('user');
+      if (!localUserStr) return;
+      try {
+        const u = JSON.parse(localUserStr);
+        const fListRes = await fetch(`/api/users/${u.id}/friends`);
+        if (fListRes.ok) setFriends(await fListRes.json());
+
+        const rRes = await fetch(`/api/users/${u.id}/reviews`);
+        if (rRes.ok) setReviews((await rRes.json()).data || []);
+      } catch (error) {}
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = () => {

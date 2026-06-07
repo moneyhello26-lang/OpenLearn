@@ -178,8 +178,8 @@ export default function CourseDetailsPage() {
     setLoading(false);
   }, [id]);
 
-  const loadComments = useCallback(async () => {
-    setCommentsLoading(true);
+  const loadComments = useCallback(async (isPolling = false) => {
+    if (!isPolling) setCommentsLoading(true);
     try {
       const res = await fetch(`/api/course-comments?courseId=${encodeURIComponent(id)}`);
       if (res.ok) {
@@ -187,7 +187,7 @@ export default function CourseDetailsPage() {
         setComments(data.data || []);
       }
     } catch (e) { console.error('loadComments', e); }
-    setCommentsLoading(false);
+    if (!isPolling) setCommentsLoading(false);
   }, [id]);
 
   const loadRatings = useCallback(async () => {
@@ -217,6 +217,13 @@ export default function CourseDetailsPage() {
   useEffect(() => {
     loadComments();
     loadRatings();
+    
+    const interval = setInterval(() => {
+      loadComments(true);
+      loadRatings();
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [loadComments, loadRatings]);
 
   useEffect(() => {

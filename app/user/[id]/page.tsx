@@ -75,6 +75,28 @@ export default function PublicProfilePage() {
       setLoading(false);
     };
     if (id) load();
+    
+    const interval = setInterval(async () => {
+      if (!id) return;
+      try {
+        const fListRes = await fetch(`/api/users/${id}/friends`);
+        if (fListRes.ok) setFriends(await fListRes.json());
+
+        const rRes = await fetch(`/api/users/${id}/reviews`);
+        if (rRes.ok) setReviews((await rRes.json()).data || []);
+
+        if (authUser) {
+          const fRes = await fetch('/api/friends', { headers: { Authorization: `Bearer ${authUser.token}` } });
+          if (fRes.ok) {
+            const data = await fRes.json();
+            const isFriend = data.data.friends.some((f: any) => f.userId === id || f.friendId === id);
+            if (isFriend) setFriendStatus('accepted');
+          }
+        }
+      } catch (e) { console.error(e); }
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [id, authUser]);
 
   const addFriend = async () => {

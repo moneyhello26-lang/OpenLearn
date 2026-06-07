@@ -24,7 +24,7 @@ export default function Home() {
             <span className="text-xs font-medium text-[#8A8F98]">OpenLearn AI 2.0 уже доступен</span>
           </div>
 
-          <h1 className="text-6xl sm:text-7xl lg:text-[5.5rem] font-extrabold tracking-tight leading-[1.05] mb-6 slide-up delay-1">
+          <h1 className="text-5xl sm:text-6xl lg:text-[5.5rem] font-extrabold tracking-tight leading-[1.05] mb-6 slide-up delay-1 break-words">
             <span className="text-white block">Образование.</span>
             <span className="block mt-2" style={{
               background: 'linear-gradient(90deg, #A87FFB 0%, #D946EF 100%)',
@@ -102,7 +102,7 @@ export default function Home() {
       {}
       <section className="relative z-10 py-32 px-6 max-w-7xl mx-auto border-t border-[rgba(255,255,255,0.05)]">
         <div className="text-center mb-16 slide-up">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white">Всё в одной экосистеме.</h2>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-white">Всё в одной экосистеме.</h2>
           <p className="text-xl text-[#8A8F98]">Разработано для максимальной фокусировки на знаниях.</p>
         </div>
         
@@ -140,7 +140,7 @@ export default function Home() {
           <div className="md:col-span-2 relative group rounded-3xl p-1 bg-[linear-gradient(135deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.01)_100%)] hover:bg-[linear-gradient(135deg,rgba(16,185,129,0.2)_0%,rgba(255,255,255,0.02)_100%)] transition-colors duration-500 overflow-hidden slide-up delay-2">
             <div className="h-full w-full rounded-[23px] bg-[#0A0A0C] border border-[rgba(255,255,255,0.05)] p-8 md:p-10 relative z-10 flex flex-col justify-center items-center text-center min-h-[340px]">
               <div className="absolute inset-0 opacity-20" style={{ background: 'radial-gradient(circle at center, rgba(16,185,129,0.2), transparent 70%)' }}></div>
-              <h3 className="text-7xl font-extrabold mb-4" style={{
+              <h3 className="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-4" style={{
                 background: 'linear-gradient(90deg, #10B981 0%, #3B82F6 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
