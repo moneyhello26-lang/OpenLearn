@@ -13,7 +13,7 @@ function getGenAI(): GoogleGenerativeAI {
   return _genAI;
 }
 
-export type AIModel = "gemini-flash-latest" | "gemini-pro-latest" | "gemma-4-26b-a4b-it";
+export type AIModel = "gemini-flash-latest" | "gemini-pro-latest" | "gemma-4-26b-a4b-it" | "gemini-1.5-flash" | "gemini-1.5-pro" | (string & {});
 
 interface AIGenerateOptions {
   temperature?: number;
@@ -273,6 +273,7 @@ export async function analyzeContent(content: string): Promise<{
   toeflScore?: string;
   feedback?: string;
   error?: string;
+  isSafe?: boolean;
 }> {
   const prompt = `You are an expert IELTS and TOEFL examiner. Evaluate the following essay/text. 
 Calculate an approximate IELTS Band Score (0-9) and a TOEFL iBT Writing Score (0-30).
