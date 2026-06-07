@@ -81,10 +81,16 @@ export async function generateChatResponse(
       maxOutputTokens: options.maxTokens ?? 2048,
     };
 
-    const contents = messages.map((msg) => ({
-      role: msg.role === "assistant" ? "model" : msg.role,
-      parts: [{ text: msg.content }],
-    }));
+    const contents = messages.map((msg, index) => {
+      let text = msg.content;
+      if (index === messages.length - 1 && msg.role === "user") {
+        text += "\n\n[SYSTEM INSTRUCTION: If you need to think, plan, or draft your response first, you MUST enclose all of your reasoning and drafting process strictly inside <think> and </think> tags. The final answer must be outside and after these tags.]";
+      }
+      return {
+        role: msg.role === "assistant" ? "model" : msg.role,
+        parts: [{ text }],
+      };
+    });
 
     const result = await generativeModel.generateContent({
       contents,
