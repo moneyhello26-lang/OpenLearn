@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       messages,
       model = "gemma-4-26b-a4b-it",
       temperature = 0.7,
-      maxTokens = 2048,
+      maxTokens = 8192,
     } = body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
