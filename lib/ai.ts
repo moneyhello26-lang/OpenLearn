@@ -84,7 +84,7 @@ export async function generateChatResponse(
     const contents = messages.map((msg, index) => {
       let text = msg.content;
       if (index === messages.length - 1 && msg.role === "user") {
-        text += "\n\n[SYSTEM INSTRUCTION: If you need to think, plan, or draft your response first, you MUST enclose all of your reasoning and drafting process strictly inside <think> and </think> tags. The final answer must be outside and after these tags.]";
+        text += "\n\n[SYSTEM INSTRUCTION: You MUST strictly separate your internal reasoning from the final answer. First write your reasoning/drafting, then write the exact string '---FINAL_ANSWER---' on a new line, and then write your actual final response for the user below it. DO NOT ignore this instruction.]";
       }
       return {
         role: msg.role === "assistant" ? "model" : msg.role,
@@ -98,7 +98,11 @@ export async function generateChatResponse(
     });
 
     let text = result.response.text();
-    text = text.replace(/<think>[\s\S]*?<\/think>\n?/ig, '').trim();
+    if (text.includes('---FINAL_ANSWER---')) {
+      text = text.split('---FINAL_ANSWER---')[1].trim();
+    } else {
+      text = text.replace(/<think>[\s\S]*?<\/think>\n?/ig, '').trim();
+    }
     return text;
   } catch (error) {
     console.error("Error generating chat response:", error);
