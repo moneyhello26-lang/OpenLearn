@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "OpenLearn.kz — Знания без барьеров",
   description: "Бесплатные учебники и гайды для каждого казахстанца. ЦУР 4.",
   verification: {
-    google: "1WvMdz0jyYOXrkjCQMgdYICvhiyz4t-FmFZ9xNxW7G4",
+    google: "8wptJgry1hhNbKBEYxxwv1wrAXJ-hvwtAJBuzJh1AAk",
   },
 };
 
