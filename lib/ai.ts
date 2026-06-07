@@ -13,7 +13,7 @@ function getGenAI(): GoogleGenerativeAI {
   return _genAI;
 }
 
-export type AIModel = "gemini-flash-latest" | "gemini-pro-latest" | "gemini-flash-latest";
+export type AIModel = "gemini-flash-latest" | "gemini-pro-latest" | "gemma-4-26b-a4b-it";
 
 interface AIGenerateOptions {
   temperature?: number;
