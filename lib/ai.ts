@@ -13,6 +13,59 @@ function getGenAI(): GoogleGenerativeAI {
   return _genAI;
 }
 
+/**
+ * Cleans AI response text by removing thinking blocks, excessive asterisks,
+ * internal reasoning artifacts, and other unwanted patterns.
+ */
+export function cleanAIResponse(text: string): string {
+  if (!text) return text;
+
+  let cleaned = text;
+
+  // 1. Remove <think>...</think> blocks (various formats)
+  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>\s*/gi, '');
+  cleaned = cleaned.replace(/<thinking>[\s\S]*?<\/thinking>\s*/gi, '');
+  cleaned = cleaned.replace(/<reasoning>[\s\S]*?<\/reasoning>\s*/gi, '');
+  cleaned = cleaned.replace(/<scratchpad>[\s\S]*?<\/scratchpad>\s*/gi, '');
+  cleaned = cleaned.replace(/<internal>[\s\S]*?<\/internal>\s*/gi, '');
+  cleaned = cleaned.replace(/<reflection>[\s\S]*?<\/reflection>\s*/gi, '');
+  cleaned = cleaned.replace(/<thought>[\s\S]*?<\/thought>\s*/gi, '');
+  cleaned = cleaned.replace(/<draft>[\s\S]*?<\/draft>\s*/gi, '');
+
+  // 2. Remove ```thinking ... ``` blocks 
+  cleaned = cleaned.replace(/```(?:thinking|reasoning|scratchpad|internal_monologue)[\s\S]*?```\s*/gi, '');
+
+  // 3. Remove lines that start with common thinking prefixes
+  cleaned = cleaned.replace(/^(?:Thinking:|Reasoning:|Let me think|Hmm,|Wait,|Actually,|Internal thought:|My reasoning:|Draft:).*$/gim, '');
+
+  // 4. Remove "---FINAL_ANSWER---" marker and everything before it
+  if (cleaned.includes('---FINAL_ANSWER---')) {
+    cleaned = cleaned.split('---FINAL_ANSWER---').pop()!;
+  }
+
+  // 5. Clean up excessive asterisks patterns:
+  //    - Remove orphaned asterisks (single * not part of bold/italic markdown)
+  //    - Clean up *** or more
+  cleaned = cleaned.replace(/\*{3,}/g, '');              // Remove *** or more
+  cleaned = cleaned.replace(/(?<!\*)\*(?!\*|\s*\w)/g, ''); // Remove orphaned trailing *
+  cleaned = cleaned.replace(/(?<!\w\s*)\*(?!\*)/g, '');    // Remove orphaned leading *
+
+  // 6. Clean up excessive bold markers that aren't proper markdown
+  //    e.g., "**" alone on a line, or unmatched **
+  cleaned = cleaned.replace(/^\*\*\s*$/gm, '');           // Lines with only **
+
+  // 7. Remove emoji-spam lines that some models produce as "thinking indicators"
+  cleaned = cleaned.replace(/^[🤔💭🧠⚙️🔄]+\s*$/gm, '');
+
+  // 8. Normalize excessive blank lines (3+ -> 2)
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+
+  // 9. Trim
+  cleaned = cleaned.trim();
+
+  return cleaned;
+}
+
 export type AIModel = "gemini-flash-latest" | "gemini-pro-latest" | "gemma-4-26b-a4b-it" | "gemini-1.5-flash" | "gemini-1.5-pro" | (string & {});
 
 interface AIGenerateOptions {
@@ -51,7 +104,7 @@ export async function generateAIResponse(
       generationConfig,
     });
 
-    return result.response.text();
+    return cleanAIResponse(result.response.text());
   } catch (error) {
     console.error("Error generating AI response:", error);
     if (prompt.includes("category")) return JSON.stringify({ isSafe: true, category: "Error", confidence: 0 });
@@ -97,12 +150,7 @@ export async function generateChatResponse(
       generationConfig,
     });
 
-    let text = result.response.text();
-    if (text.includes('---FINAL_ANSWER---')) {
-      text = text.split('---FINAL_ANSWER---')[1].trim();
-    } else {
-      text = text.replace(/<think>[\s\S]*?<\/think>\n?/ig, '').trim();
-    }
+    const text = cleanAIResponse(result.response.text());
     return text;
   } catch (error) {
     console.error("Error generating chat response:", error);
