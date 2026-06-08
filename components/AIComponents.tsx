@@ -2,52 +2,27 @@
 
 import { useState } from "react";
 import { useUniversityFinder, useAskAI, useGenerateDescription } from "@/lib/useAI";
+import { cleanAIResponse } from "@/lib/clean-response";
 import ReactMarkdown from "react-markdown";
-
-/** Client-side cleaning: removes thinking blocks, excessive asterisks, etc. */
-function cleanText(text: string): string {
-  let cleaned = text;
-  // Remove thinking/reasoning XML blocks
-  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>\s*/gi, '');
-  cleaned = cleaned.replace(/<thinking>[\s\S]*?<\/thinking>\s*/gi, '');
-  cleaned = cleaned.replace(/<reasoning>[\s\S]*?<\/reasoning>\s*/gi, '');
-  cleaned = cleaned.replace(/<scratchpad>[\s\S]*?<\/scratchpad>\s*/gi, '');
-  cleaned = cleaned.replace(/<reflection>[\s\S]*?<\/reflection>\s*/gi, '');
-  cleaned = cleaned.replace(/<thought>[\s\S]*?<\/thought>\s*/gi, '');
-  cleaned = cleaned.replace(/<draft>[\s\S]*?<\/draft>\s*/gi, '');
-  // Remove ```thinking blocks
-  cleaned = cleaned.replace(/```(?:thinking|reasoning|scratchpad|internal_monologue)[\s\S]*?```\s*/gi, '');
-  // Remove thinking prefix lines
-  cleaned = cleaned.replace(/^(?:Thinking:|Reasoning:|Let me think|Hmm,|Wait,|Actually,|Internal thought:|My reasoning:|Draft:).*$/gim, '');
-  // Handle ---FINAL_ANSWER--- marker
-  if (cleaned.includes('---FINAL_ANSWER---')) {
-    cleaned = cleaned.split('---FINAL_ANSWER---').pop()!;
-  }
-  // Clean excessive asterisks
-  cleaned = cleaned.replace(/\*{3,}/g, '');
-  cleaned = cleaned.replace(/^\*\*\s*$/gm, '');
-  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
-  return cleaned.trim();
-}
 
 function renderData(data: unknown): React.ReactNode {
   if (!data) return null;
 
   if (typeof data === "string") {
-    return <ReactMarkdown>{cleanText(data)}</ReactMarkdown>;
+    return <ReactMarkdown>{cleanAIResponse(data)}</ReactMarkdown>;
   }
 
   if (typeof data === "object") {
     const obj = data as Record<string, unknown>;
 
     if ("response" in obj && typeof obj.response === "string") {
-      return <ReactMarkdown>{cleanText(obj.response)}</ReactMarkdown>;
+      return <ReactMarkdown>{cleanAIResponse(obj.response)}</ReactMarkdown>;
     }
     if ("answer" in obj && obj.answer !== undefined && obj.answer !== null) {
-      return <ReactMarkdown>{cleanText(String(obj.answer))}</ReactMarkdown>;
+      return <ReactMarkdown>{cleanAIResponse(String(obj.answer))}</ReactMarkdown>;
     }
     if ("description" in obj && obj.description !== undefined && obj.description !== null) {
-      return <ReactMarkdown>{cleanText(String(obj.description))}</ReactMarkdown>;
+      return <ReactMarkdown>{cleanAIResponse(String(obj.description))}</ReactMarkdown>;
     }
   }
 

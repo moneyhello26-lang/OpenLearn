@@ -2,49 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useAIRequest } from "@/lib/useAI";
+import { cleanAIResponse } from "@/lib/clean-response";
 import ReactMarkdown from "react-markdown";
-
-/**
- * Client-side cleaning for AI responses.
- * Strips thinking blocks, excessive asterisks, and other artifacts
- * that models like Gemma sometimes leak into output.
- */
-function cleanMessageContent(text: string): string {
-  if (!text) return text;
-  let cleaned = text;
-
-  // Remove various thinking/reasoning XML-like blocks
-  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>\s*/gi, '');
-  cleaned = cleaned.replace(/<thinking>[\s\S]*?<\/thinking>\s*/gi, '');
-  cleaned = cleaned.replace(/<reasoning>[\s\S]*?<\/reasoning>\s*/gi, '');
-  cleaned = cleaned.replace(/<scratchpad>[\s\S]*?<\/scratchpad>\s*/gi, '');
-  cleaned = cleaned.replace(/<internal>[\s\S]*?<\/internal>\s*/gi, '');
-  cleaned = cleaned.replace(/<reflection>[\s\S]*?<\/reflection>\s*/gi, '');
-  cleaned = cleaned.replace(/<thought>[\s\S]*?<\/thought>\s*/gi, '');
-  cleaned = cleaned.replace(/<draft>[\s\S]*?<\/draft>\s*/gi, '');
-
-  // Remove ```thinking ... ``` code blocks
-  cleaned = cleaned.replace(/```(?:thinking|reasoning|scratchpad|internal_monologue)[\s\S]*?```\s*/gi, '');
-
-  // Remove common thinking prefix lines
-  cleaned = cleaned.replace(/^(?:Thinking:|Reasoning:|Let me think|Hmm,|Wait,|Actually,|Internal thought:|My reasoning:|Draft:).*$/gim, '');
-
-  // Handle ---FINAL_ANSWER--- marker
-  if (cleaned.includes('---FINAL_ANSWER---')) {
-    cleaned = cleaned.split('---FINAL_ANSWER---').pop()!;
-  }
-
-  // Clean excessive asterisks (*** or more)
-  cleaned = cleaned.replace(/\*{3,}/g, '');
-  // Lines with only **
-  cleaned = cleaned.replace(/^\*\*\s*$/gm, '');
-  // Emoji-only thinking lines
-  cleaned = cleaned.replace(/^[🤔💭🧠⚙️🔄]+\s*$/gm, '');
-  // Normalize blank lines
-  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
-
-  return cleaned.trim();
-}
 
 interface Message {
   role: "user" | "assistant";
@@ -88,7 +47,7 @@ export function ChatComponent() {
         rawContent = result.data.message;
       }
       if (rawContent) {
-        setMessages(prev => [...prev, { role: "assistant", content: cleanMessageContent(rawContent) }]);
+        setMessages(prev => [...prev, { role: "assistant", content: cleanAIResponse(rawContent) }]);
       }
     } catch (err) {
       console.error("Chat error:", err);
@@ -133,7 +92,7 @@ export function ChatComponent() {
             >
               {message.role === "assistant" ? (
                 <div className="prose prose-invert prose-sm max-w-none">
-                  <ReactMarkdown>{cleanMessageContent(message.content)}</ReactMarkdown>
+                  <ReactMarkdown>{cleanAIResponse(message.content)}</ReactMarkdown>
                 </div>
               ) : (
                 <p className="whitespace-pre-wrap">{message.content}</p>
