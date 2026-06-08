@@ -1,5 +1,5 @@
 
-import { generateChatResponse } from "@/lib/ai";
+import { generateChatResponse, cleanAIResponse } from "@/lib/ai";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ChatRequest {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: response,
+      message: cleanAIResponse(response),
     });
   } catch (error) {
     console.error("Error in chat:", error);

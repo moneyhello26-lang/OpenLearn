@@ -133,7 +133,7 @@ export function ChatComponent() {
             >
               {message.role === "assistant" ? (
                 <div className="prose prose-invert prose-sm max-w-none">
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                  <ReactMarkdown>{cleanMessageContent(message.content)}</ReactMarkdown>
                 </div>
               ) : (
                 <p className="whitespace-pre-wrap">{message.content}</p>
