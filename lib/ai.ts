@@ -13,8 +13,8 @@ function getGenAI(): GoogleGenerativeAI {
   return _genAI;
 }
 
-// Re-export the centralized cleaning function
-export { cleanAIResponse } from "./clean-response";
+import { cleanAIResponse } from "./clean-response";
+export { cleanAIResponse };
 
 export type AIModel = "gemini-flash-latest" | "gemini-pro-latest" | "gemma-4-26b-a4b-it" | "gemini-1.5-flash" | "gemini-1.5-pro" | (string & {});
 
